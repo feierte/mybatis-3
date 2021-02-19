@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.apache.demo.mapper.UserMapper">
+
+    <!-- 配置该命名空间的二级缓存 -->
+    <cache></cache>
+
+    <select id="selectUser" resultType="User">
+        SELECT user_id AS "id", user_name AS "username"
+        FROM `user`
+        WHERE user_id = #{id}
+    </select>
+
+    <select id="selectUserByConstructor" resultMap="userResultMap">
+        SELECT * FROM `user` WHERE user_id = #{id}
+    </select>
+
+    <resultMap id="userResultMap" type="User">
+        <!-- constructor：用于在实例化类时，注入结果到构造方法中 -->
+        <constructor>
+            <!-- idArg：id参数，标记出作为id的结果可以帮助提高整体性能 -->
+            <!--<idArg name="id" column="user_id" javaType="int"/>-->
+            <!-- arg：将被注入到构造方法的一个普通结果
+                column：数据库中的列名，或者是列的别名。一般情况下，这和传递给 resultSet.getString(columnName) 方法的参数一样。
+                name：构造方法形参的名字。从 3.4.3 版本开始，通过指定具体的参数名，你可以以任意顺序写入 arg 元素。
+             -->
+            <arg column="user_id" javaType="Integer"/>
+            <arg column="user_name" javaType="String"/>
+            <arg column="user_password" javaType="String"/>
+        </constructor>
+    </resultMap>
+
+    <!--<select id="selectPerson"
+            parameterType="int"
+            parameterMap="deprecated"
+            resultType="hashmap"
+            resultMap="personResultMap"
+            flushCache="false"
+            useCache="true"
+            timeout="10"
+            fetchSize="256"
+            statementType="PREPARED"
+            resultSetType="FORWARD_ONLY">
+        SELECT * FROM `user` WHERE user_id = #{id}
+    </select>-->
+
+</mapper>

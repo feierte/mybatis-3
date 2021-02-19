@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <!--<properties resource="classpath:"></properties>-->
+
+
+
+    <settings>
+        <setting name="cacheEnabled" value="true"/>
+        <setting name="useGeneratedKeys" value="true"/>
+        <!--指定 MyBatis 所用日志的具体实现，未指定时将自动查找。-->
+        <setting name="logImpl" value="STDOUT_LOGGING"/>
+    </settings>
+
+
+    <typeAliases>
+        <typeAlias type="org.apache.demo.entity.User" alias="User"/>
+    </typeAliases>
+
+    <!--<typeHandlers></typeHandlers>-->
+
+    <!--<objectFactory type=""></objectFactory>-->
+
+
+    <!--<plugins>
+        &lt;!&ndash; 注册拦截器，一个plugin表示一个拦截器 &ndash;&gt;
+        <plugin interceptor="org.sperri.mybatis.java.intercept.PageInterceptor">
+            <property name="databaseType" value="mysql"/>
+        </plugin>
+    </plugins>-->
+
+
+    <environments default="development">
+        <environment id="development">
+
+            <!--
+            type属性有两个值:JDBC和MANAGED
+               JDBC：直接使用JDK提供的JDBC来管理事务的各个环节：提交、回滚、关闭等操作。
+               MANAGED：MANAGED什么都不做，那么有什么意义呢，当然很重要。MANAGED类型的事务模型其实是一个托管模型，
+               也就是说它自身并不实现任何事务功能，而是托管出去由其他框架来实现。托管的意义显而易见，正是为整合而设。
+               所以有关JDBC事务模块的内容明显不再是MyBatis功能中的重点，也许只有在单独使用MyBatis的少量系统中才会使用到。
+            -->
+            <transactionManager type="JDBC"></transactionManager>
+            <dataSource type="POOLED">
+                <property name="driver" value="com.mysql.jdbc.Driver"/>
+                <property name="url" value="jdbc:mysql://47.102.156.134:3306/cms?characterEncoding=utf-8"/>
+                <property name="username" value="root"/>
+                <property name="password" value="123456"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <mappers>
+
+        <!-- 使用相对于类路径的资源引用 -->
+        <mapper resource="org/apache/demo/mapper/UserMapper.xml"></mapper>
+        <!--<package name=""/>-->
+    </mappers>
+</configuration>
