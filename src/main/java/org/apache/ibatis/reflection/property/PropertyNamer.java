@@ -48,6 +48,11 @@ public final class PropertyNamer {
     return isGetter(name) || isSetter(name);
   }
 
+  /**
+   * 判断方法是否是get方法（boolean成员变量的get方法是 is开头的）
+   * @param name 方法名
+   * @return
+   */
   public static boolean isGetter(String name) {
     return (name.startsWith("get") && name.length() > 3) || (name.startsWith("is") && name.length() > 2);
   }

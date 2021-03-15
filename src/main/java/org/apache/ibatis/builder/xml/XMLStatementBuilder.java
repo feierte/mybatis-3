@@ -35,6 +35,8 @@ import org.apache.ibatis.session.Configuration;
 
 /**
  * @author Clinton Begin
+ * @apiNote
+ * 解析mapper 映射文件中的CRUD标签
  */
 public class XMLStatementBuilder extends BaseBuilder {
 

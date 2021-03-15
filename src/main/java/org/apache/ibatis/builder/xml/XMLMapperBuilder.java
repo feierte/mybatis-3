@@ -52,10 +52,15 @@ import org.apache.ibatis.type.TypeHandler;
 /**
  * @author Clinton Begin
  * @author Kazuki Shimizu
+ *
+ * @apiNote
+ * XMLMapperBuilder 中会将 mapper 映射文件中除 CRUD 外的标签解析验证，轮到CRUD标签的时候，是交给专门的类去做处理的，也就是XMLStatementBuilder
  */
 public class XMLMapperBuilder extends BaseBuilder {
 
+  // 用来解析XML文件
   private final XPathParser parser;
+  // 再解析完成后，用解析所得的属性来帮助创建各个对象
   private final MapperBuilderAssistant builderAssistant;
   private final Map<String, XNode> sqlFragments;
   private final String resource;

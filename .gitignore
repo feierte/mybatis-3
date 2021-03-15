@@ -1,5 +1,5 @@
 rebel.xml
-/.github
+/.github/workflows
 /*.iml
 /*.ipr
 /*.iws

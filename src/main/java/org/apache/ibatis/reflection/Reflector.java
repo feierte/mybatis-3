@@ -50,11 +50,17 @@ import org.apache.ibatis.reflection.property.PropertyNamer;
 public class Reflector {
 
   private final Class<?> type;
+  // 可读属性的集合，所谓的可读属性就是存在get方法的属性。初始化为空
   private final String[] readablePropertyNames;
+  // 可写属性的集合，所谓的可写属性就是存在set方法的属性。初始化为空
   private final String[] writablePropertyNames;
+  // 记录了属性相应的set方法，key是属性名称，value是Invoker对象，它是对set方法对应Method对象的封装
   private final Map<String, Invoker> setMethods = new HashMap<>();
+  // 记录了属性相应的get方法，key是属性名称，value是Invoker对象，它是对get方法对应Method对象的封装
   private final Map<String, Invoker> getMethods = new HashMap<>();
+  // 记录了属性相应set方法的参数类型,key是属性名，value是set方法的参数类型
   private final Map<String, Class<?>> setTypes = new HashMap<>();
+  // 记录了属性相应get方法的参数类型,key是属性名，value是get方法的参数类型
   private final Map<String, Class<?>> getTypes = new HashMap<>();
   private Constructor<?> defaultConstructor;
 
@@ -76,6 +82,10 @@ public class Reflector {
     }
   }
 
+  /**
+   * 解析类中默认的构造方法
+   * @param clazz
+   */
   private void addDefaultConstructor(Class<?> clazz) {
     Constructor<?>[] constructors = clazz.getDeclaredConstructors();
     Arrays.stream(constructors).filter(constructor -> constructor.getParameterTypes().length == 0)
@@ -85,6 +95,7 @@ public class Reflector {
   private void addGetMethods(Class<?> clazz) {
     Map<String, List<Method>> conflictingGetters = new HashMap<>();
     Method[] methods = getClassMethods(clazz);
+    // 过滤出get方法（方法参数为0个，并且命名规则符合get方法）
     Arrays.stream(methods).filter(m -> m.getParameterTypes().length == 0 && PropertyNamer.isGetter(m.getName()))
       .forEach(m -> addMethodConflict(conflictingGetters, PropertyNamer.methodToProperty(m.getName()), m));
     resolveGetterConflicts(conflictingGetters);
@@ -135,9 +146,12 @@ public class Reflector {
 
   private void addSetMethods(Class<?> clazz) {
     Map<String, List<Method>> conflictingSetters = new HashMap<>();
+    // 获取 该类 及其父类 还有 该类或其父类实现的接口中所有的方法
     Method[] methods = getClassMethods(clazz);
+    // 过滤出类中属性的 setter方法
     Arrays.stream(methods).filter(m -> m.getParameterTypes().length == 1 && PropertyNamer.isSetter(m.getName()))
       .forEach(m -> addMethodConflict(conflictingSetters, PropertyNamer.methodToProperty(m.getName()), m));
+    //
     resolveSetterConflicts(conflictingSetters);
   }
 
@@ -148,10 +162,19 @@ public class Reflector {
     }
   }
 
+  /**
+   * <p>当子类覆盖了父类的getter方法且返回值发生变化时，在Reflector.getClassMethods()中就会产生两个签名
+   * 不同的方法。例如现有类A及其子类SubA, A 类中定义了getNames（）方法，其返回值类型是List<String＞，
+   * 而在其子类SubA 中， 覆写了其getNames（）方法且将返回值修改成ArrayList类型，
+   * 这种覆写在Java 语言中是合法的。最终得到的两个方法签名分别是java.util.List#getNames和java.util.ArrayList#getNames，
+   * 在Reflector.addUniqueMethods（）方法中会被认为是两个不同的方法并添加到uniqueMethods 集合中，这显然不是我们想要的结果。
+   * <p>Reflector.resolveGetterConflicts（）方法对这种覆写的情况进行处理，同时会将处理得到的getter 方法记录到getMethods 集合，并将其返回值类型填充到getTypes 集合。
+   * @param conflictingSetters
+   */
   private void resolveSetterConflicts(Map<String, List<Method>> conflictingSetters) {
     for (Entry<String, List<Method>> entry : conflictingSetters.entrySet()) {
-      String propName = entry.getKey();
-      List<Method> setters = entry.getValue();
+      String propName = entry.getKey(); // 属性名称
+      List<Method> setters = entry.getValue(); // 属性对应的setter方法
       Class<?> getterType = getTypes.get(propName);
       boolean isGetterAmbiguous = getMethods.get(propName) instanceof AmbiguousMethodInvoker;
       boolean isSetterAmbiguous = false;

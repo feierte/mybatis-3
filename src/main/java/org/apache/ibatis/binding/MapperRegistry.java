@@ -54,6 +54,7 @@ public class MapperRegistry {
   }
 
   public <T> boolean hasMapper(Class<T> type) {
+
     return knownMappers.containsKey(type);
   }
 
