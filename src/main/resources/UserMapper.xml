@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mapper namespace="org.apache.demo.mapper.UserMapper">
+
+  <!-- sql的唯一标识：namespace.id : statementId -->
+  <select id="selectList" resultType="org.sperri.orm.pojo.User">
+    select * from user
+  </select>
+
+  <select id="selectUser" parameterType="org.sperri.orm.pojo.User" resultType="org.sperri.orm.pojo.User">
+      SELECT user_id AS "id", user_name AS "username"
+      FROM `user`
+      WHERE user_id = #{id} and user_name = #{username}
+  </select>
+</mapper>

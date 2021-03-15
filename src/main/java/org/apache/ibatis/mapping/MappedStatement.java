@@ -38,7 +38,7 @@ public final class MappedStatement {
 
   private String resource; // mapper映射文件的路径
   private Configuration configuration;
-  // 节点的id属性加命名空间,如：com.lucky.mybatis.dao.UserMapper.selectByExample
+  // 节点的id属性加命名空间: namespace.id,如：com.lucky.mybatis.dao.UserMapper.selectByExample
   private String id;
   // 尝试影响驱动程序每次批量返回的结果行数和这个设置值相等
   private Integer fetchSize;
