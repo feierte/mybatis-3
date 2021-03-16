@@ -6,8 +6,6 @@ package org.sperri.orm;
  */
 public class SimpleExecutor implements Executor {
 
-  private Configuration configuration;
-  private MappedStatement mappedStatement;
 
 
 

@@ -11,6 +11,13 @@ public class Resources {
 
   public static InputStream getResourceAsStream(String path) {
 
-    return Resources.class.getClassLoader().getResourceAsStream(path);
+    ClassLoader classLoader = Resources.class.getClassLoader();
+
+    InputStream inputStream = Resources.class.getClassLoader().getResourceAsStream(path);
+    if (inputStream == null) {
+      classLoader = Thread.currentThread().getContextClassLoader();
+      inputStream = classLoader.getResourceAsStream(path);
+    }
+    return inputStream;
   }
 }

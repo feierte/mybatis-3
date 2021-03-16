@@ -102,14 +102,14 @@ public class Configuration {
 
   protected Environment environment;
 
-  protected boolean safeRowBoundsEnabled;
+  protected boolean safeRowBoundsEnabled; // 对应mybatis-config.xml中setting属性safeRowBoundsEnabled，允许在嵌套语句中使用分页（RowBounds）。如果允许使用则设置为false
   protected boolean safeResultHandlerEnabled = true;
   protected boolean mapUnderscoreToCamelCase;
   protected boolean aggressiveLazyLoading;
   protected boolean multipleResultSetsEnabled = true;
   protected boolean useGeneratedKeys;
   protected boolean useColumnLabel = true;
-  protected boolean cacheEnabled = true;
+  protected boolean cacheEnabled = true; // 对应配置文件中setting属性cacheEnabled，全局地开启或关闭配置文件中的所有映射器已经配置的任何缓存。
   protected boolean callSettersOnNulls;
   protected boolean useActualParamName = true;
   protected boolean returnInstanceForEmptyRow;
@@ -126,7 +126,7 @@ public class Configuration {
   protected Integer defaultFetchSize;
   protected ResultSetType defaultResultSetType;
   protected ExecutorType defaultExecutorType = ExecutorType.SIMPLE;
-  protected AutoMappingBehavior autoMappingBehavior = AutoMappingBehavior.PARTIAL;
+  protected AutoMappingBehavior autoMappingBehavior = AutoMappingBehavior.PARTIAL; // 对应mybatis-config.xml中setting属性autoMappingBehavior
   protected AutoMappingUnknownColumnBehavior autoMappingUnknownColumnBehavior = AutoMappingUnknownColumnBehavior.NONE;
 
   protected Properties variables = new Properties();
@@ -181,24 +181,30 @@ public class Configuration {
   }
 
   public Configuration() {
+    // 事务
     typeAliasRegistry.registerAlias("JDBC", JdbcTransactionFactory.class);
     typeAliasRegistry.registerAlias("MANAGED", ManagedTransactionFactory.class);
 
+    // 数据源工厂
     typeAliasRegistry.registerAlias("JNDI", JndiDataSourceFactory.class);
     typeAliasRegistry.registerAlias("POOLED", PooledDataSourceFactory.class);
     typeAliasRegistry.registerAlias("UNPOOLED", UnpooledDataSourceFactory.class);
 
+    // 几种缓存
     typeAliasRegistry.registerAlias("PERPETUAL", PerpetualCache.class);
     typeAliasRegistry.registerAlias("FIFO", FifoCache.class);
     typeAliasRegistry.registerAlias("LRU", LruCache.class);
     typeAliasRegistry.registerAlias("SOFT", SoftCache.class);
     typeAliasRegistry.registerAlias("WEAK", WeakCache.class);
 
+    // 供应商DataBaseId提供者
     typeAliasRegistry.registerAlias("DB_VENDOR", VendorDatabaseIdProvider.class);
 
+    // mybatis默认的xml驱动为XMLLanguageDriver，用来解析动态sql
     typeAliasRegistry.registerAlias("XML", XMLLanguageDriver.class);
     typeAliasRegistry.registerAlias("RAW", RawLanguageDriver.class);
 
+    // 日志类型
     typeAliasRegistry.registerAlias("SLF4J", Slf4jImpl.class);
     typeAliasRegistry.registerAlias("COMMONS_LOGGING", JakartaCommonsLoggingImpl.class);
     typeAliasRegistry.registerAlias("LOG4J", Log4jImpl.class);
@@ -207,6 +213,7 @@ public class Configuration {
     typeAliasRegistry.registerAlias("STDOUT_LOGGING", StdOutImpl.class);
     typeAliasRegistry.registerAlias("NO_LOGGING", NoLoggingImpl.class);
 
+    // 代理工厂
     typeAliasRegistry.registerAlias("CGLIB", CglibProxyFactory.class);
     typeAliasRegistry.registerAlias("JAVASSIST", JavassistProxyFactory.class);
 
@@ -678,6 +685,7 @@ public class Configuration {
     if (cacheEnabled) {
       executor = new CachingExecutor(executor);
     }
+    // 插件开发，动态代理、责任链模式
     executor = (Executor) interceptorChain.pluginAll(executor);
     return executor;
   }

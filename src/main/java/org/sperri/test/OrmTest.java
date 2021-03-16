@@ -13,7 +13,7 @@ public class OrmTest {
 
   @Test
   public void test() {
-    String path = "src/main/resources/sqlMapConfig.xml";
+    String path = "sqlMapConfig.xml";
     InputStream inputStream = Resources.getResourceAsStream(path);
     System.out.println(inputStream);
   }
