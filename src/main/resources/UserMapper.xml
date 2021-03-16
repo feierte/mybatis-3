@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<mapper namespace="org.apache.demo.mapper.UserMapper">
+<mapper namespace="user">
 
   <!-- sql的唯一标识：namespace.id : statementId -->
   <select id="selectList" resultType="org.sperri.orm.pojo.User">

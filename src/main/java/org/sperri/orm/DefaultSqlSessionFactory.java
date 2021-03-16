@@ -5,8 +5,15 @@ package org.sperri.orm;
  * @date 2021/3/15 20:26
  */
 public class DefaultSqlSessionFactory implements SqlSessionFactory {
-  @Override
+
+  private Configuration configuration;
+
+  public DefaultSqlSessionFactory(Configuration configuration) {
+    this.configuration = configuration;
+  }
+
+    @Override
   public SqlSession openSqlSession() {
-    return null;
+    return new DefaultSqlSession(configuration);
   }
 }
