@@ -34,7 +34,7 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
 public abstract class BaseBuilder {
   protected final Configuration configuration;
   protected final TypeAliasRegistry typeAliasRegistry;
-  protected final TypeHandlerRegistry typeHandlerRegistry;
+  protected final TypeHandlerRegistry typeHandlerRegistry; // 对应mybatis-config.xml中</typeHandlers>标签
 
   public BaseBuilder(Configuration configuration) {
     this.configuration = configuration;

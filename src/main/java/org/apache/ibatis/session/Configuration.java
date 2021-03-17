@@ -100,7 +100,7 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
  */
 public class Configuration {
 
-  protected Environment environment;
+  protected Environment environment; // 对应mybatis-config.xml中</environment>标签
 
   protected boolean safeRowBoundsEnabled; // 对应mybatis-config.xml中setting属性safeRowBoundsEnabled，允许在嵌套语句中使用分页（RowBounds）。如果允许使用则设置为false
   protected boolean safeResultHandlerEnabled = true;
@@ -129,15 +129,15 @@ public class Configuration {
   protected AutoMappingBehavior autoMappingBehavior = AutoMappingBehavior.PARTIAL; // 对应mybatis-config.xml中setting属性autoMappingBehavior
   protected AutoMappingUnknownColumnBehavior autoMappingUnknownColumnBehavior = AutoMappingUnknownColumnBehavior.NONE;
 
-  protected Properties variables = new Properties();
-  protected ReflectorFactory reflectorFactory = new DefaultReflectorFactory();
-  protected ObjectFactory objectFactory = new DefaultObjectFactory();
-  protected ObjectWrapperFactory objectWrapperFactory = new DefaultObjectWrapperFactory();
+  protected Properties variables = new Properties(); // 对应配置文件中<properties>标签
+  protected ReflectorFactory reflectorFactory = new DefaultReflectorFactory(); // 对应mybatis-config.xml中</reflectorFactory>标签
+  protected ObjectFactory objectFactory = new DefaultObjectFactory(); // 对应mybatis-config.xml中</objectFactory>标签
+  protected ObjectWrapperFactory objectWrapperFactory = new DefaultObjectWrapperFactory(); // 对应mybatis-config.xml中</objectWrapperFactory>标签
 
   protected boolean lazyLoadingEnabled = false;
   protected ProxyFactory proxyFactory = new JavassistProxyFactory(); // #224 Using internal Javassist instead of OGNL
 
-  protected String databaseId;
+  protected String databaseId; // 对应mybatis-config.xml中</databaseIdProvider>标签
   /**
    * Configuration factory class.
    * Used to create Configuration for loading deserialized unread properties.
@@ -146,21 +146,22 @@ public class Configuration {
    */
   protected Class<?> configurationFactory;
 
-  protected final MapperRegistry mapperRegistry = new MapperRegistry(this);
-  protected final InterceptorChain interceptorChain = new InterceptorChain();
+  protected final MapperRegistry mapperRegistry = new MapperRegistry(this); // 对应mybatis-config.xml中<mappers>标签
+  protected final InterceptorChain interceptorChain = new InterceptorChain(); // 对应mybatis-config.xml中<plugins>标签
   protected final TypeHandlerRegistry typeHandlerRegistry = new TypeHandlerRegistry(this);
-  protected final TypeAliasRegistry typeAliasRegistry = new TypeAliasRegistry();
+  protected final TypeAliasRegistry typeAliasRegistry = new TypeAliasRegistry(); // 对应mybatis-config.xml中<typeAliases>标签
   protected final LanguageDriverRegistry languageRegistry = new LanguageDriverRegistry();
 
   protected final Map<String, MappedStatement> mappedStatements = new StrictMap<MappedStatement>("Mapped Statements collection")
       .conflictMessageProducer((savedValue, targetValue) ->
           ". please check " + savedValue.getResource() + " and " + targetValue.getResource());
+  // 二级缓存，key：mapper.xml中的namespace，mapper.xml中<cache/>标签配置的Cache就存放在这里
   protected final Map<String, Cache> caches = new StrictMap<>("Caches collection");
   protected final Map<String, ResultMap> resultMaps = new StrictMap<>("Result Maps collection");
   protected final Map<String, ParameterMap> parameterMaps = new StrictMap<>("Parameter Maps collection");
   protected final Map<String, KeyGenerator> keyGenerators = new StrictMap<>("Key Generators collection");
 
-  protected final Set<String> loadedResources = new HashSet<>();
+  protected final Set<String> loadedResources = new HashSet<>(); // 存放已经加载过的Mapper.xml文件的资源路径
   protected final Map<String, XNode> sqlFragments = new StrictMap<>("XML fragments parsed from previous mappers");
 
   protected final Collection<XMLStatementBuilder> incompleteStatements = new LinkedList<>();
@@ -173,6 +174,7 @@ public class Configuration {
    * references a cache bound to another namespace and the value is the
    * namespace which the actual cache is bound to.
    */
+  // mapper.xml中<cache-ref namespace=""/>标签配置的cacheRef就存储在这
   protected final Map<String, String> cacheRefMap = new HashMap<>();
 
   public Configuration(Environment environment) {

@@ -47,10 +47,6 @@
     <setting name="logImpl" value="STDOUT_LOGGING"/>
   </settings>
 
-  <plugins>
-    <plugin interceptor=""></plugin>
-  </plugins>
-
   <typeAliases>
     <typeAlias type="org.apache.demo.entity.User" alias="User"/>
   </typeAliases>
@@ -66,6 +62,8 @@
           <property name="databaseType" value="mysql"/>
       </plugin>
   </plugins>-->
+
+
 
 
   <environments default="development">
@@ -89,8 +87,7 @@
   </environments>
 
   <!--  数据库厂商标识: 为了解决数据库厂商不同的而造成的语句不能执行问题 -->
-  <databaseIdProvider type=""></databaseIdProvider>
-
+  <!--<databaseIdProvider type=""></databaseIdProvider>-->
 
   <mappers>
     <!-- 使用相对于类路径的资源引用 -->
