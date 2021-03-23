@@ -55,6 +55,9 @@ public abstract class BaseExecutor implements Executor {
   protected Executor wrapper;
 
   protected ConcurrentLinkedQueue<DeferredLoad> deferredLoads;
+  // 一级缓存：会话级缓存，生命周期是整个会话SqlSession，非常短暂，不能直接关闭，不能跨线程使用
+  // 注意这里的 本地缓存是同一个session内的缓存，也就是同一个open session内
+  // 根据CacheKey决定是否已经缓存
   protected PerpetualCache localCache;
   protected PerpetualCache localOutputParameterCache;
   protected Configuration configuration;
@@ -136,6 +139,10 @@ public abstract class BaseExecutor implements Executor {
     return query(ms, parameter, rowBounds, resultHandler, key, boundSql);
   }
 
+  /**
+   * 1、先查本地缓存，没有再去查数据库，注意这里的 本地缓存是同一个session内的缓存，也就是同一个opensession内。
+   * 2、通过configuration.getLocalCacheScope() == LocalCacheScope.STATEMENT来看，可以设置参数，将本地缓存去掉，不使用本地缓存。
+   */
   @SuppressWarnings("unchecked")
   @Override
   public <E> List<E> query(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
@@ -149,10 +156,12 @@ public abstract class BaseExecutor implements Executor {
     List<E> list;
     try {
       queryStack++;
+      // resultHandler为空，先查本地缓存，注意这里的 本地缓存是同一个session内的缓存，也就是同一个open session内。
       list = resultHandler == null ? (List<E>) localCache.getObject(key) : null;
       if (list != null) {
         handleLocallyCachedOutputParameters(ms, key, parameter, boundSql);
       } else {
+        // 本地缓存没有，再去查数据库
         list = queryFromDatabase(ms, parameter, rowBounds, resultHandler, key, boundSql);
       }
     } finally {
@@ -164,8 +173,9 @@ public abstract class BaseExecutor implements Executor {
       }
       // issue #601
       deferredLoads.clear();
+      // 通过configuration.getLocalCacheScope() == LocalCacheScope.STATEMENT来看，可以设置参数，将本地缓存去掉，不使用本地缓存。
       if (configuration.getLocalCacheScope() == LocalCacheScope.STATEMENT) {
-        // issue #482
+        // issue #482 清除本地缓存
         clearLocalCache();
       }
     }
@@ -317,6 +327,7 @@ public abstract class BaseExecutor implements Executor {
       }
     }
   }
+
 
   private <E> List<E> queryFromDatabase(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
     List<E> list;

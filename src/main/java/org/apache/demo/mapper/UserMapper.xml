@@ -15,7 +15,7 @@
     5、缓存会存储列表集合或对象(无论查询方法返回什么)的 1024 个引用。
     6、缓存会被视为是 read/write(可读/可写)的缓存,意味着对象检索不是共享的,而 且可以安全地被调用者修改,而不干扰其他调用者或线程所做的潜在修改。
    -->
-  <cache></cache>
+  <!--<cache></cache>-->
 
   <select id="selectUser" resultType="User">
     SELECT user_id AS "id", user_name AS "username"

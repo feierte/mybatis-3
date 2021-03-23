@@ -45,6 +45,7 @@ public final class MappedStatement {
   // SQL超时时间
   private Integer timeout;
   // Statement的类型，STATEMENT（直接操作SQL，不进行预编译）/PREPARE（预处理参数，进行预编译，获取数据）/CALLABLE（执行存储过程）
+  // 决定在操作数据库时（Executor中创建StatementHandler时起作用），使用的是Statement、PreparedStatement还是CallableStatement
   private StatementType statementType;
   // 结果集类型，FORWARD_ONLY/SCROLL_SENSITIVE/SCROLL_INSENSITIVE
   private ResultSetType resultSetType;

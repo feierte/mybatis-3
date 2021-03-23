@@ -9,7 +9,7 @@
 
   <settings>
     <!-- 全局地开启或关闭配置文件中的所有映射器已经配置的任何缓存。 -->
-    <setting name="cacheEnabled" value="true"/>
+    <!--<setting name="cacheEnabled" value="true"/>-->
     <!-- 延迟加载的全局开关。当开启时，所有关联对象都会延迟加载。 特定关联关系中可通过设置fetchType属性来覆盖该项的开关状态。 -->
     <setting name="lazyLoadingEnabled" value="true"/>
     <!-- 是否允许单一语句返回多结果集（需要兼容驱动）。 -->

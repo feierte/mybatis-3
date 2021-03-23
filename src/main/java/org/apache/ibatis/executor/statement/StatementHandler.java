@@ -30,18 +30,30 @@ import org.apache.ibatis.session.ResultHandler;
  */
 public interface StatementHandler {
 
+  /**
+   * 用于创建一个具体的 Statement 对象的实现类（PreparedStatement）或者是 Statement 对象
+   */
   Statement prepare(Connection connection, Integer transactionTimeout)
       throws SQLException;
 
+  /**
+   * 用于初始化 Statement 对象以及对sql的占位符进行赋值
+   */
   void parameterize(Statement statement)
       throws SQLException;
 
   void batch(Statement statement)
       throws SQLException;
 
+  /**
+   * 用于通知 Statement 对象将 insert、update、delete 操作推送到数据库
+   */
   int update(Statement statement)
       throws SQLException;
 
+  /**
+   * 用于通知 Statement 对象将 select 操作推送数据库并返回对应的查询结果
+   */
   <E> List<E> query(Statement statement, ResultHandler resultHandler)
       throws SQLException;
 
