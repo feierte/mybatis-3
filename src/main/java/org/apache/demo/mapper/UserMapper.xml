@@ -7,7 +7,8 @@
   <!-- 其他命名空间缓存配置的引用 -->
   <!--<cache-ref namespace=""/>-->
 
-  <!-- 开启并配置该命名空间的二级缓存：当开启了二级缓存
+  <!-- 开启并配置该命名空间的二级缓存，应用级缓存，生命周期是整个应用，可以跨线程使用：
+  当开启了二级缓存
     1、映射语句文件中的所有 select 语句将会被缓存。
     2、映射语句文件中的所有 insert,update 和 delete 语句会刷新缓存。
     3、缓存会使用 Least Recently Used(LRU,最近最少使用的)算法来收回。
@@ -17,7 +18,7 @@
    -->
   <!--<cache></cache>-->
 
-  <select id="selectUser" resultType="User">
+  <select id="selectUser" resultType="User" statementType="PREPARED">
     SELECT user_id AS "id", user_name AS "username"
     FROM `user`
     WHERE user_id = #{id}

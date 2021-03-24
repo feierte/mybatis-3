@@ -4,12 +4,14 @@
   "http://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
 
-  <!--<properties resource="classpath:"></properties>-->
+  <properties resource="db.properties"></properties>
 
 
   <settings>
-    <!-- 全局地开启或关闭配置文件中的所有映射器已经配置的任何缓存。 -->
-    <!--<setting name="cacheEnabled" value="true"/>-->
+    <!-- 全局地开启或关闭配置文件中的所有映射器已经配置的任何缓存。
+      与mapper.xml文件中的<cache></cache>标签，共同决定“二级缓存”的启用与停止
+     -->
+    <setting name="cacheEnabled" value="true"/>
     <!-- 延迟加载的全局开关。当开启时，所有关联对象都会延迟加载。 特定关联关系中可通过设置fetchType属性来覆盖该项的开关状态。 -->
     <setting name="lazyLoadingEnabled" value="true"/>
     <!-- 是否允许单一语句返回多结果集（需要兼容驱动）。 -->
@@ -78,10 +80,10 @@
       -->
       <transactionManager type="JDBC"></transactionManager>
       <dataSource type="POOLED">
-        <property name="driver" value="com.mysql.cj.jdbc.Driver"/>
-        <property name="url" value="jdbc:mysql://47.102.156.134:3306/cms?characterEncoding=utf-8"/>
-        <property name="username" value="root"/>
-        <property name="password" value="123456"/>
+        <property name="driver" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
       </dataSource>
     </environment>
   </environments>

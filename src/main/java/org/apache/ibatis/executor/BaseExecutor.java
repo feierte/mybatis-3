@@ -55,10 +55,15 @@ public abstract class BaseExecutor implements Executor {
   protected Executor wrapper;
 
   protected ConcurrentLinkedQueue<DeferredLoad> deferredLoads;
-  // 一级缓存：会话级缓存，生命周期是整个会话SqlSession，非常短暂，不能直接关闭，不能跨线程使用
+  // 一级缓存（本地缓存），默认开启的，不需要任何配置：会话级缓存，生命周期是整个会话SqlSession，非常短暂，不能直接关闭，不能跨线程使用
   // 注意这里的 本地缓存是同一个session内的缓存，也就是同一个open session内
   // 根据CacheKey决定是否已经缓存
+  /*
+   * 修改（执行sql前清空缓存）、查询（mapper.xml的sql块上配置了一级缓存作用域statementType="STATEMENT"，后置清空）、
+   * 提交（提交前清空缓存）、回滚（回滚前清空缓存），都可能会清空一级缓存
+   */
   protected PerpetualCache localCache;
+  // 一级缓存：缓存输出参数
   protected PerpetualCache localOutputParameterCache;
   protected Configuration configuration;
 
@@ -150,6 +155,7 @@ public abstract class BaseExecutor implements Executor {
     if (closed) {
       throw new ExecutorException("Executor was closed.");
     }
+    // mapper.xml的sql块上配置了flushCache=true，前置清空
     if (queryStack == 0 && ms.isFlushCacheRequired()) {
       clearLocalCache();
     }
@@ -161,7 +167,7 @@ public abstract class BaseExecutor implements Executor {
       if (list != null) {
         handleLocallyCachedOutputParameters(ms, key, parameter, boundSql);
       } else {
-        // 本地缓存没有，再去查数据库
+        // 本地缓存没有，再去查数据库，查询到结果放入localCache
         list = queryFromDatabase(ms, parameter, rowBounds, resultHandler, key, boundSql);
       }
     } finally {
@@ -173,6 +179,7 @@ public abstract class BaseExecutor implements Executor {
       }
       // issue #601
       deferredLoads.clear();
+      // mapper.xml的sql块上配置了一级缓存作用域statementType="STATEMENT"，后置清空
       // 通过configuration.getLocalCacheScope() == LocalCacheScope.STATEMENT来看，可以设置参数，将本地缓存去掉，不使用本地缓存。
       if (configuration.getLocalCacheScope() == LocalCacheScope.STATEMENT) {
         // issue #482 清除本地缓存
@@ -206,6 +213,15 @@ public abstract class BaseExecutor implements Executor {
     if (closed) {
       throw new ExecutorException("Executor was closed.");
     }
+    /*
+     * 从这里可以看出一级缓存的命中条件：
+     * 1、同一个SqlSession会话。不是同一个会话，就不是同一个localCache，这点很重要！！！
+     * 2、StatementId相同 。com.test.UserMapper.selectById
+     * 3、分页参数RowBounds相同。limit 1
+     * 4、SQL语句相同。select id from user where id = ?
+     * 5、SQL查询参数相同。 id =1
+     * 6、环境相同。environmentId=development 通常不会跨环境开发，可以忽略
+     */
     CacheKey cacheKey = new CacheKey();
     cacheKey.update(ms.getId());
     cacheKey.update(rowBounds.getOffset());
@@ -228,7 +244,7 @@ public abstract class BaseExecutor implements Executor {
           MetaObject metaObject = configuration.newMetaObject(parameterObject);
           value = metaObject.getValue(propertyName);
         }
-        cacheKey.update(value);
+        cacheKey.update(value); // sql参数
       }
     }
     if (configuration.getEnvironment() != null) {

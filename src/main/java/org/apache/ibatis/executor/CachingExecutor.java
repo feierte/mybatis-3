@@ -35,10 +35,54 @@ import org.apache.ibatis.transaction.Transaction;
 /**
  * @author Clinton Begin
  * @author Eduardo Macarron
+ *
+ * @apiNote 二级缓存
+ *
+ * <p>读取mybatis-config全局配置文件的时候会根据我们配置的Executor类型来创建对应的三种Executor中的一种，然后如果我们开启了二级缓存之后，
+ * 只要开启(全局配置文件中配置为true)就会使用CachingExecutor来对我们的三种基本Executor进行包装，即使Mapper.xml映射文件没有开启也会进行包装。
+ *
+ * <p>二级缓存
+ * 一级缓存因为只能在同一个SqlSession中共享，所以会存在一个问题，在分布式或者多线程的环境下，不同会话之间对于相同的数据可能会产生不同的结果，因为跨会话修改了数据是不能互相感知的，所以就有可能存在脏数据的问题，正因为一级缓存存在这种不足，所以我们需要一种作用域更大的缓存，这就是二级缓存。
+ *
+ * <p>二级缓存的作用范围
+ * 一级缓存作用域是SqlSession级别，所以它存储的SqlSession中的BaseExecutor之中，但是二级缓存目的就是要实现作用范围更广，那肯定是要实现跨会话共享的，在MyBatis中二级缓存的作用域是namespace，也就是作用范围是同一个命名空间，所以很显然二级缓存是需要存储在SqlSession之外的，那么二级缓存应该存储在哪里合适呢？
+ *
+ * 在MyBatis中为了实现二级缓存，专门用了一个装饰器来维护，这就是：CachingExecutor。
+ *
+ * <p>如何开启二级缓存
+ * 二级缓存相关的配置有三个地方：
+ * 1、mybatis-config中有一个全局配置属性，这个不配置也行，因为默认就是true。
+ *     <setting name="cacheEnabled" value="true"/>
+ * 2、在Mapper映射文件内需要配置缓存标签：
+ *    <cache/>
+ *    或
+ *    <cache-ref namespace="com.lonelyWolf.mybatis.mapper.UserAddressMapper"/>
+ * 3、在select查询语句标签上配置useCache属性，如下：
+ *      <select id="selectUserAndJob" resultMap="JobResultMap2" useCache="true">
+ *         select * from lw_user
+ *     </select>
+ * 以上配置第1点是默认开启的，也就是说我们只要配置第2点就可以打开二级缓存了，而第3点是当我们需要针对某一条语句来配置二级缓存时候则可以使用。
+ *
+ * <p>注意事项
+ * 不过开启二级缓存的时候有两点需要注意：
+ *  1、需要commit事务之后才会生效
+ *  2、如果使用的是默认缓存，那么结果集对象需要实现序列化接口(Serializable)
+ *
+ * <p>二级缓存启动时机
+ * 既然一级缓存默认是开启的，而二级缓存是需要我们手动开启的，那么我们什么时候应该开启二级缓存呢？
+ *    1、因为所有的update操作(insert,delete,uptede)都会触发缓存的刷新，从而导致二级缓存失效，所以二级缓存适合在读多写少的场景中开启。
+ *    2、因为二级缓存针对的是同一个namespace，所以建议是在单表操作的Mapper中使用，或者是在相关表的Mapper文件中共享同一个缓存。
+ *
+ * <p>自定义缓存
+ * 一级缓存可能存在脏读情况，那么二级缓存是否也可能存在呢？
+ * 是的，默认的二级缓存毕竟也是存储在本地缓存，所以对于微服务下是可能出现脏读的情况的，所以这时候我们可能会需要自定义缓存，
+ * 比如利用redis来存储缓存，而不是存储在本地内存当中。
+ * MyBatis官方提供的第三方缓存，如：MyBatis官方提供的第三方缓存mybatis-redis
  */
 public class CachingExecutor implements Executor {
 
   private final Executor delegate;
+  // 用来管理二级缓存
   private final TransactionalCacheManager tcm = new TransactionalCacheManager();
 
   public CachingExecutor(Executor delegate) {
@@ -101,6 +145,7 @@ public class CachingExecutor implements Executor {
         List<E> list = (List<E>) tcm.getObject(cache, key);
         if (list == null) {
           list = delegate.query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
+          // 注意，二级缓存存储的时候会先存储到一个临时属性中，直到事务提交才保存到真实的二级缓存中，目的是防止脏读
           tcm.putObject(cache, key, list); // issue #578 and #116
         }
         return list;

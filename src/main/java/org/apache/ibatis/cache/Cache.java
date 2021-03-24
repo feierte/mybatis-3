@@ -37,6 +37,10 @@ import java.util.concurrent.locks.ReadWriteLock;
  * </pre>
  *
  * @author Clinton Begin
+ *
+ * @apiNote MyBatis中的缓存相关类都在cache包下面，而且定义了一个顶级接口Cache，默认只有一个实现类PerpetualCache，PerpetualCache中是内部维护了一个HashMap来实现缓存。
+ * 需要注意的是decorators包下面的所有类也实现了Cache接口，那么为什么我还是要说Cache只有一个实现类呢？其实看名字就知道了，这个包里面全部是装饰器，也就是说这其实是装饰器模式的一种实现。
+ * 随便打开decorator包下面的一个接口可以看到，最终都是调用了delegate来实现，只是将部分功能做了增强，其本身都需要依赖Cache的唯一实现类PerpetualCache(因为装饰器内需要传入Cache对象，故而只能传入PerpetualCache对象，因为接口是无法直接new出来传进去的)。
  */
 
 public interface Cache {

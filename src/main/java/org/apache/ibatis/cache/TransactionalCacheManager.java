@@ -41,7 +41,7 @@ public class TransactionalCacheManager {
 
   public void commit() {
     for (TransactionalCache txCache : transactionalCaches.values()) {
-      txCache.commit();
+      txCache.commit(); // 这里会将存储了临时缓存的值真正存储到二级缓存中
     }
   }
 
