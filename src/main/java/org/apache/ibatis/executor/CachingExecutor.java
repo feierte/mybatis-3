@@ -36,7 +36,7 @@ import org.apache.ibatis.transaction.Transaction;
  * @author Clinton Begin
  * @author Eduardo Macarron
  *
- * @apiNote 二级缓存
+ * @apiNote 二级缓存（全局缓存）
  *
  * <p>读取mybatis-config全局配置文件的时候会根据我们配置的Executor类型来创建对应的三种Executor中的一种，然后如果我们开启了二级缓存之后，
  * 只要开启(全局配置文件中配置为true)就会使用CachingExecutor来对我们的三种基本Executor进行包装，即使Mapper.xml映射文件没有开启也会进行包装。
@@ -70,8 +70,9 @@ import org.apache.ibatis.transaction.Transaction;
  *
  * <p>二级缓存启动时机
  * 既然一级缓存默认是开启的，而二级缓存是需要我们手动开启的，那么我们什么时候应该开启二级缓存呢？
- *    1、因为所有的update操作(insert,delete,uptede)都会触发缓存的刷新，从而导致二级缓存失效，所以二级缓存适合在读多写少的场景中开启。
- *    2、因为二级缓存针对的是同一个namespace，所以建议是在单表操作的Mapper中使用，或者是在相关表的Mapper文件中共享同一个缓存。
+ *    1、因为二级缓存针对的是同一个namespace，所以建议是在单表操作的Mapper中使用，或者是在相关表的Mapper文件中共享同一个缓存。
+ *    2、因为所有的update操作(insert,delete,uptede)都会触发缓存的刷新，从而导致二级缓存失效，所以二级缓存适合在读多写少的场景中开启。
+ *    这一点不需要多说，所有人都应该清楚。记住，这一点需要保证在1的前提下才可以！
  *
  * <p>自定义缓存
  * 一级缓存可能存在脏读情况，那么二级缓存是否也可能存在呢？

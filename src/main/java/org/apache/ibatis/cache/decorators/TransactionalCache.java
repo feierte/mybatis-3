@@ -39,10 +39,10 @@ public class TransactionalCache implements Cache {
 
   private static final Log log = LogFactory.getLog(TransactionalCache.class);
 
-  private final Cache delegate;
-  private boolean clearOnCommit;
-  private final Map<Object, Object> entriesToAddOnCommit;
-  private final Set<Object> entriesMissedInCache;
+  private final Cache delegate; // 二级缓存
+  private boolean clearOnCommit; // true表示提交事务的时候就清除缓存
+  private final Map<Object, Object> entriesToAddOnCommit; // 这里记录了临时缓存，当commit的时候会将其加入到二级缓存中
+  private final Set<Object> entriesMissedInCache; // 记录了未命中缓存的key
 
   public TransactionalCache(Cache delegate) {
     this.delegate = delegate;
@@ -105,6 +105,9 @@ public class TransactionalCache implements Cache {
     reset();
   }
 
+  /**
+   * 重置二级缓存
+   */
   private void reset() {
     clearOnCommit = false;
     entriesToAddOnCommit.clear();

@@ -8,7 +8,7 @@
 
 
   <settings>
-    <!-- 全局地开启或关闭配置文件中的所有映射器已经配置的任何缓存。
+    <!-- 全局地开启或关闭配置文件中的所有映射器已经配置的任何缓存（二级缓存）。
       与mapper.xml文件中的<cache></cache>标签，共同决定“二级缓存”的启用与停止
      -->
     <setting name="cacheEnabled" value="true"/>
