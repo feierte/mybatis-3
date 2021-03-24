@@ -42,10 +42,12 @@ public abstract class BaseStatementHandler implements StatementHandler {
   protected final ObjectFactory objectFactory;
   protected final TypeHandlerRegistry typeHandlerRegistry;
   protected final ResultSetHandler resultSetHandler;
+  // 处理sql中的参数：使用传入的实参替换SQL语句中的?
   protected final ParameterHandler parameterHandler;
 
   protected final Executor executor;
   protected final MappedStatement mappedStatement;
+  // 用于分页
   protected final RowBounds rowBounds;
 
   protected BoundSql boundSql;
@@ -86,8 +88,8 @@ public abstract class BaseStatementHandler implements StatementHandler {
     Statement statement = null;
     try {
       statement = instantiateStatement(connection);
-      setStatementTimeout(statement, transactionTimeout);
-      setFetchSize(statement);
+      setStatementTimeout(statement, transactionTimeout); // 设置执行超时时间
+      setFetchSize(statement); // 设置fetchSize，对大的结果集才有明显效果
       return statement;
     } catch (SQLException e) {
       closeStatement(statement);

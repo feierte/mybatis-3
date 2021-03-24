@@ -37,7 +37,8 @@ public interface StatementHandler {
       throws SQLException;
 
   /**
-   * 用于初始化 Statement 对象以及对sql的占位符进行赋值
+   * 用于初始化 Statement 对象以及对sql的占位符进行赋值（使用传入的实参替换SQL语句中的?）
+   * 传到这里的sql是已经预编译的sql，这里使用传入的实参替换SQL语句中的?
    */
   void parameterize(Statement statement)
       throws SQLException;

@@ -25,8 +25,17 @@ import java.sql.SQLException;
  */
 public interface ParameterHandler {
 
+  /**
+   * 获取参数，这个参数值就是你传递进来的值，可能是个实体、map或单个基本类型数据。
+   * @return
+   */
   Object getParameterObject();
 
+  /**
+   * 用来设置参数的，相当于对sql中所有的参数都执行ps.setXXX(value);
+   * @param ps
+   * @throws SQLException
+   */
   void setParameters(PreparedStatement ps) throws SQLException;
 
 }

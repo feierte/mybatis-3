@@ -18,6 +18,10 @@
    -->
   <!--<cache></cache>-->
 
+  <!--
+    statementType （可选配置，默认配置为PREPARED）值为STATEMENT，PREPARED 或 CALLABLE 的一个。
+    这会让 MyBatis 分别使用 Statement，PreparedStatement 或 CallableStatement，默认值：PREPARED。
+   -->
   <select id="selectUser" resultType="User" statementType="PREPARED">
     SELECT user_id AS "id", user_name AS "username"
     FROM `user`
