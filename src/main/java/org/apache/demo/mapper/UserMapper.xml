@@ -7,6 +7,18 @@
   <!-- 其他命名空间缓存配置的引用 -->
   <!--<cache-ref namespace=""/>-->
 
+  <select id="selectUserByCondition" parameterType="user" resultType="user">
+    select * from `user`
+    <where>
+      <if test="id != null">
+        and id = #{id}
+      </if>
+      <if test="username != null">
+        and username = #{username}
+      </if>
+    </where>
+  </select>
+
   <!-- 开启并配置该命名空间的二级缓存，应用级缓存，生命周期是整个应用，可以跨线程使用：
   当开启了二级缓存
     1、映射语句文件中的所有 select 语句将会被缓存。
@@ -33,6 +45,7 @@
     FROM `user`
     WHERE user_id = #{id}
   </select>
+
 
   <resultMap id="userResultMap" type="User">
     <!-- constructor：用于在实例化类时，注入结果到构造方法中 -->

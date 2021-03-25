@@ -32,6 +32,8 @@ import org.w3c.dom.NodeList;
 
 /**
  * @author Frank D. Martinez [mnesarco]
+ *
+ * @apiNote 用于解析mapper.xml文件中的<include>标签
  */
 public class XMLIncludeTransformer {
 

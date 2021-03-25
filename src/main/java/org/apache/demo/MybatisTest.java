@@ -9,6 +9,7 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * @author jie zhao
@@ -49,6 +50,8 @@ public class MybatisTest {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
 
 
+
+
       User u = sqlSession.selectOne("org.apache.demo.mapper.UserMapper.selectUser", 1);
       System.out.println(u);
       /*
@@ -58,6 +61,11 @@ public class MybatisTest {
        * 使用完毕之后即可丢弃。
        */
       UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+
+      User parameter = new User(1, "张三", "");
+      List<User> users = mapper.selectUserByCondition(parameter);
+      System.out.println(users);
+
       User user = mapper.selectUser(1);
       System.out.println(user);
 

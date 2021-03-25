@@ -37,6 +37,10 @@ import org.apache.ibatis.session.Configuration;
  * @author Clinton Begin
  * @apiNote
  * 解析mapper 映射文件中的CRUD标签
+ *
+ * <p>这是mapper解析中的关键，他作为mapper解析的助理类，负责将解析出来的结果保存下来，
+ * 并且通过configuration.addMappedStatement方法保存到conguration对象中，最终在调用dao是根据传入的参数动态生成sql。
+ * 所以说configuration是MyBatis调用的调配中心。
  */
 public class XMLStatementBuilder extends BaseBuilder {
 

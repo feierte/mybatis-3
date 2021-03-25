@@ -31,6 +31,9 @@ import org.w3c.dom.NodeList;
 
 /**
  * @author Clinton Begin
+ *
+ * @apiNote 这个XMLScriptBuilder类才是真正负责在背后解析mapper文件中的每个<select/>,<insert/>,<update/>,<delete/>节点内的SQL字符串(其中可能包含动态SQL部分,诸如<if/>,<where/>等),
+ * 并把解析结果保存到SqlNode中
  */
 public class XMLScriptBuilder extends BaseBuilder {
 
@@ -52,6 +55,7 @@ public class XMLScriptBuilder extends BaseBuilder {
 
 
   private void initNodeHandlerMap() {
+    // 各个动态sql标签节点对应的处理者
     nodeHandlerMap.put("trim", new TrimHandler());
     nodeHandlerMap.put("where", new WhereHandler());
     nodeHandlerMap.put("set", new SetHandler());
@@ -63,7 +67,13 @@ public class XMLScriptBuilder extends BaseBuilder {
     nodeHandlerMap.put("bind", new BindHandler());
   }
 
+  /**
+   * 作为被public修饰的方法, 其提供了对外契约.
+   * XMLScriptBuilder内部逻辑主入口，最终返回对MixedSqlNode的封装，根据isDynamic决定具体SqlSource的实现类
+   * @return
+   */
   public SqlSource parseScriptNode() {
+    // 注意这个细节, 最终解析出来的节点集合, 统一使用MixedSqlNode进行包裹.供外界使用.
     MixedSqlNode rootSqlNode = parseDynamicTags(context);
     SqlSource sqlSource;
     if (isDynamic) {
@@ -74,6 +84,12 @@ public class XMLScriptBuilder extends BaseBuilder {
     return sqlSource;
   }
 
+  /**
+   * 当前方法的作用是解析当前XNode, 返回当前XNode下的直接子XNode的集合.
+   * 该方法会被递归调用
+   * @param node  当前进行解析的总node, 就是`<select/>`,`<insert/>`,`<update/>`,`<delete/>`节点中的所有内容在调用本方法前被读取为一个XNode
+   * @return
+   */
   protected MixedSqlNode parseDynamicTags(XNode node) {
     List<SqlNode> contents = new ArrayList<>();
     NodeList children = node.getNode().getChildNodes();
@@ -82,6 +98,7 @@ public class XMLScriptBuilder extends BaseBuilder {
       if (child.getNode().getNodeType() == Node.CDATA_SECTION_NODE || child.getNode().getNodeType() == Node.TEXT_NODE) {
         String data = child.getStringBody("");
         TextSqlNode textSqlNode = new TextSqlNode(data);
+        // 根据isDynamic()决定SqlNode的类型
         if (textSqlNode.isDynamic()) {
           contents.add(textSqlNode);
           isDynamic = true;
@@ -102,6 +119,10 @@ public class XMLScriptBuilder extends BaseBuilder {
   }
 
   private interface NodeHandler {
+    /**
+     * @param nodeToHandle  当前要进行处理的节点
+     * @param targetContents  用于存储解析nodeToHandle得到的SqlNode, 也就是说其中存放着与nodeToHandle同级别的所有SqlNode(即与nodeToHandle同级别的其他XNode解析出来的SqlNode)
+     */
     void handleNode(XNode nodeToHandle, List<SqlNode> targetContents);
   }
 

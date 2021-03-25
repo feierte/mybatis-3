@@ -60,7 +60,7 @@ public class XMLMapperBuilder extends BaseBuilder {
 
   // 用来解析XML文件
   private final XPathParser parser;
-  // 再解析完成后，用解析所得的属性来帮助创建各个对象
+  // 存储mapper.xml文件解析后的数据，在解析完成后，用解析所得的属性来帮助创建各个对象
   private final MapperBuilderAssistant builderAssistant;
   private final Map<String, XNode> sqlFragments;
   private final String resource;

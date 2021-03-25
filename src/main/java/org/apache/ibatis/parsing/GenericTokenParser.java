@@ -20,9 +20,9 @@ package org.apache.ibatis.parsing;
  */
 public class GenericTokenParser {
 
-  private final String openToken;
-  private final String closeToken;
-  private final TokenHandler handler;
+  private final String openToken; // 字符串开始标记
+  private final String closeToken; // 字符串结束标记
+  private final TokenHandler handler; // 字符串处理器
 
   public GenericTokenParser(String openToken, String closeToken, TokenHandler handler) {
     this.openToken = openToken;

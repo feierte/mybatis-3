@@ -325,6 +325,7 @@ public class XMLConfigBuilder extends BaseBuilder {
   private DataSourceFactory dataSourceElement(XNode context) throws Exception {
     if (context != null) {
       String type = context.getStringAttribute("type");
+      // 在这里将${}替换为properties文件中对应的键值对的值
       Properties props = context.getChildrenAsProperties();
       DataSourceFactory factory = (DataSourceFactory) resolveClass(type).getDeclaredConstructor().newInstance();
       factory.setProperties(props);
