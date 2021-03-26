@@ -261,6 +261,7 @@ public class XMLMapperBuilder extends BaseBuilder {
 
   private ResultMap resultMapElement(XNode resultMapNode, List<ResultMapping> additionalResultMappings, Class<?> enclosingType) {
     ErrorContext.instance().activity("processing " + resultMapNode.getValueBasedIdentifier());
+    // 获取 type 属性， 表示结果集将被映射为 type 指定类型的对象
     String type = resultMapNode.getStringAttribute("type",
         resultMapNode.getStringAttribute("ofType",
             resultMapNode.getStringAttribute("resultType",
@@ -285,14 +286,19 @@ public class XMLMapperBuilder extends BaseBuilder {
         resultMappings.add(buildResultMappingFromContext(resultChild, typeClass, flags));
       }
     }
+    // 获取 ID , 默认值会拼装所有父节点的 id 或 value 或 property
     String id = resultMapNode.getStringAttribute("id",
             resultMapNode.getValueBasedIdentifier());
+    // 获取 extends 属性， 其表示结果集的继承
     String extend = resultMapNode.getStringAttribute("extends");
+    // 自动映射属性。 将列名自动映射为属性
     Boolean autoMapping = resultMapNode.getBooleanAttribute("autoMapping");
+    // 创建 ResultMapResolver 对象， 该对象可以生成 ResultMap 对象
     ResultMapResolver resultMapResolver = new ResultMapResolver(builderAssistant, id, typeClass, extend, discriminator, resultMappings, autoMapping);
     try {
       return resultMapResolver.resolve();
     } catch (IncompleteElementException e) {
+      // 如果无法创建 ResultMap 对象， 则将该结果添加到 incompleteResultMaps 集合中
       configuration.addIncompleteResultMap(resultMapResolver);
       throw e;
     }

@@ -93,13 +93,13 @@
 
   <mappers>
     <!-- 使用相对于类路径的资源引用 -->
-    <mapper resource="org/apache/demo/mapper/UserMapper.xml"></mapper>
+    <!--<mapper resource="org/apache/demo/mapper/UserMapper.xml"></mapper>-->
     <!-- 使用完全限定资源定位符（URL） -->
     <!--<mapper url="file:///var/mappers/AuthorMapper.xml"/>-->
     <!-- 使用映射器接口实现类的完全限定类名 -->
     <!--<mapper class="org.mybatis.builder.AuthorMapper"/>-->
 
-    <!-- 将包内的映射器接口实现全部注册为映射器 -->
-    <!--<package name="org.mybatis.builder"/>-->
+    <!-- 将包内的映射器接口实现全部注册为映射器 Mapper接口类必须和Mapperxml文件 名称相同且在相同的包下 -->
+    <package name="org.apache.demo.mapper"/>
   </mappers>
 </configuration>

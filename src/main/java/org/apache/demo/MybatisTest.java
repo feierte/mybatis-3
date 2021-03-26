@@ -1,6 +1,8 @@
 package org.apache.demo;
 
+import org.apache.demo.entity.Order;
 import org.apache.demo.entity.User;
+import org.apache.demo.mapper.OrderMapper;
 import org.apache.demo.mapper.UserMapper;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
@@ -50,7 +52,9 @@ public class MybatisTest {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
 
 
-
+      OrderMapper orderMapper = sqlSession.getMapper(OrderMapper.class);
+      List<Order> orders = orderMapper.findOrders();
+      System.out.println(orders);
 
       User u = sqlSession.selectOne("org.apache.demo.mapper.UserMapper.selectUser", 1);
       System.out.println(u);

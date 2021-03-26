@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.apache.demo.mapper.OrderMapper">
+
+  <resultMap id="orderMap" type="org.apache.demo.entity.Order">
+    <id property="id" column="id"></id>
+    <result property="price" column="price"></result>
+
+    <association property="user" javaType="org.apache.demo.entity.User">
+      <id property="id" column="user_id"></id>
+      <result property="username" column="user_name"></result>
+    </association>
+  </resultMap>
+
+  <select id="findOrders" resultMap="orderMap" >
+    select * from orders, `user` u where orders.uid = u.user_id;
+  </select>
+
+</mapper>
