@@ -6,8 +6,15 @@
 
   <!-- 其他命名空间缓存配置的引用 -->
   <!--<cache-ref namespace=""/>-->
+  <cache></cache>
 
-  <select id="selectUserByCondition" parameterType="user" resultType="user">
+  <!--
+    useCache属性：用来本条sql设置是否禁用二级缓存的。设置useCache为false可以禁用当前select语句的二级缓存，
+      即每次查询都会发出sql去查询数据库，默认值是true，即当前select语句使用二级缓存。
+    flushCache属性：默认情况下为true，即刷新缓存。
+     -->
+  <select id="selectUserByCondition" parameterType="user" resultType="user"
+          useCache="true" flushCache="true">
     select * from `user`
     <where>
       <if test="id != null">

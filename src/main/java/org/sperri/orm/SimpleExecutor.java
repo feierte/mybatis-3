@@ -2,9 +2,14 @@ package org.sperri.orm;
 
 import org.sperri.orm.util.ParameterMapping;
 
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,21 +38,45 @@ public class SimpleExecutor implements Executor {
       Class<?> parameterClass = getClassType(parameterType);
       // 设置sql参数
       List<ParameterMapping> parameterMappingList = boundSql.getParameterMappingList();
-      for (int i=0; i < parameterMappingList.size(); i++) {
+      for (int i = 0; i < parameterMappingList.size(); i++) {
         ParameterMapping parameterMapping = parameterMappingList.get(i);
         String content = parameterMapping.getContent();
         // 反射，获取实体中对应的属性值
         Field declaredField = parameterClass.getDeclaredField(content);
         declaredField.setAccessible(true);
         Object o = declaredField.get(params[0]);
-        preparedStatement.setObject(i+1, o);
+        preparedStatement.setObject(i + 1, o);
       }
 
+      // 执行sql
+      ResultSet resultSet = preparedStatement.executeQuery();
+
+
+      String resultType = mappedStatement.getResultType();
+      Class<?> resultTypeClass = getClassType(resultType);
+
+      Object o = resultTypeClass.newInstance();
+      List<Object> list = new ArrayList<>();
+      // 封装sql返回结果
+      while (resultSet.next()) {
+        ResultSetMetaData metaData = resultSet.getMetaData();
+        for (int i = 1; i <= metaData.getColumnCount(); i++) {
+          String columnName = metaData.getColumnName(i);
+          Object value = resultSet.getObject(columnName);
+
+
+          PropertyDescriptor propertyDescriptor = new PropertyDescriptor(columnName, resultTypeClass);
+          Method writeMethod = propertyDescriptor.getWriteMethod();
+          writeMethod.invoke(o, value);
+        }
+        list.add(o);
+      }
+
+      return (List<T>) list;
 
     } catch (Exception e) {
-
+      return null;
     }
-    return null;
   }
 
   private Class<?> getClassType(String parameterType) {
@@ -65,8 +94,9 @@ public class SimpleExecutor implements Executor {
 
   /**
    * 完成对#{}解析工作：
-   *  1、将#{}用？代替
-   *  2、解析出#{}里面的值进行存储
+   * 1、将#{}用？代替
+   * 2、解析出#{}里面的值进行存储
+   *
    * @param sql
    * @return
    */
