@@ -40,15 +40,25 @@ public class SqlSourceBuilder extends BaseBuilder {
     super(configuration);
   }
 
+  /**
+   * 将原始sql中的 #{} 使用 占位符 ? 替换掉
+   * @param originalSql
+   * @param parameterType
+   * @param additionalParameters
+   * @return
+   */
   public SqlSource parse(String originalSql, Class<?> parameterType, Map<String, Object> additionalParameters) {
+    // 创建ParameterMappingTokenHandler对象
     ParameterMappingTokenHandler handler = new ParameterMappingTokenHandler(configuration, parameterType, additionalParameters);
+    // 创建GenericTokenParser对象
     GenericTokenParser parser = new GenericTokenParser("#{", "}", handler);
-    String sql;
+    String sql; // 执行解析sql
     if (configuration.isShrinkWhitespacesInSql()) {
       sql = parser.parse(removeExtraWhitespaces(originalSql));
     } else {
       sql = parser.parse(originalSql);
     }
+    // 使用解析完的sql创建SqlSource
     return new StaticSqlSource(configuration, sql, handler.getParameterMappings());
   }
 
@@ -82,12 +92,26 @@ public class SqlSourceBuilder extends BaseBuilder {
       return parameterMappings;
     }
 
+    /**
+     * 完成对#{}解析工作：
+     *  1、将#{}用？代替
+     *  2、解析出#{}里面的值进行存储
+     * @param content 被#{}包裹的变量，例如：#{id}中的id
+     * @return
+     */
     @Override
     public String handleToken(String content) {
       parameterMappings.add(buildParameterMapping(content));
       return "?";
     }
 
+    /**
+     * 1、解析传进来的content内容，看是否有变量，如果有从对应参数类中获取这个属性的类型，
+     * 2、解析其存在他其他如javaType等参数设置到ParameterMapping内部的Builder方法中
+     * 3、通过Builder构建ParameterMapping
+     * @param content 被#{}包裹的变量，例如：#{id}中的id
+     * @return
+     */
     private ParameterMapping buildParameterMapping(String content) {
       Map<String, String> propertiesMap = parseParameterMapping(content);
       String property = propertiesMap.get("property");

@@ -49,6 +49,9 @@ public class ParamNameResolver {
    * <li>aMethod(int a, int b) -&gt; {{0, "0"}, {1, "1"}}</li>
    * <li>aMethod(int a, RowBounds rb, int b) -&gt; {{0, "0"}, {2, "1"}}</li>
    * </ul>
+   *
+   * @apiNote 根据接口方法按顺序记录下接口参数的定义的名字，如果使用@Param指定了名字，就会记录这个名字，
+   * 如果没有记录，那么就会使用它的序号作为名字。
    */
   private final SortedMap<Integer, String> names;
 
@@ -121,12 +124,14 @@ public class ParamNameResolver {
    */
   public Object getNamedParams(Object[] args) {
     final int paramCount = names.size();
+    // 入参为null或没有时，参数转换为null
     if (args == null || paramCount == 0) {
       return null;
+      // 没有使用@Param注解并且只有一个参数时，返回这一个参数
     } else if (!hasParamAnnotation && paramCount == 1) {
       Object value = args[names.firstKey()];
       return wrapToMapIfCollection(value, useActualParamName ? names.get(0) : null);
-    } else {
+    } else { // 使用了@Param注解或有多个参数时，将参数转换为Map1类型，并且还根据参数顺序存储了key为param1,param2的参数。
       final Map<String, Object> param = new ParamMap<>();
       int i = 0;
       for (Map.Entry<Integer, String> entry : names.entrySet()) {
@@ -151,10 +156,14 @@ public class ParamNameResolver {
    *                        (If specify a name, set an object to {@link ParamMap} with specified name)
    * @return a {@link ParamMap}
    * @since 3.5.5
+   *
+   * @apiNote wrapCollection处理的是只有一个参数时，集合和数组的类型转换成Map2类型，并且有默认的Key，
+   * 从这里你能大概看到为什么<foreach>中默认情况下写的array和list（Map类型没有默认值map）。
    */
   public static Object wrapToMapIfCollection(Object object, String actualParamName) {
     if (object instanceof Collection) {
       ParamMap<Object> map = new ParamMap<>();
+      // 这里是为了支持Set类型，需要等到MyBatis 3.3.0版本才能使用。
       map.put("collection", object);
       if (object instanceof List) {
         map.put("list", object);

@@ -52,9 +52,12 @@ public class MybatisTest {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
 
 
-      OrderMapper orderMapper = sqlSession.getMapper(OrderMapper.class);
+      /**
+       * 一对一情况
+       */
+     /* OrderMapper orderMapper = sqlSession.getMapper(OrderMapper.class);
       List<Order> orders = orderMapper.findOrders();
-      System.out.println(orders);
+      System.out.println(orders);*/
 
       User u = sqlSession.selectOne("org.apache.demo.mapper.UserMapper.selectUser", 1);
       System.out.println(u);
