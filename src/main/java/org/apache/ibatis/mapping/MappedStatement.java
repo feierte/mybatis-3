@@ -56,8 +56,8 @@ public final class MappedStatement {
   private ParameterMap parameterMap;
   // 对应Mapper.xml文件中的 resultMap
   private List<ResultMap> resultMaps;
-  private boolean flushCacheRequired; // 控制在执行sql后，是否刷新缓存
-  private boolean useCache; // 控制在查询时，是否使用缓存
+  private boolean flushCacheRequired; // 控制在执行sql后，是否刷新缓存，对应flushCache属性
+  private boolean useCache; // 控制在查询时，是否使用缓存，对应useCache属性
   private boolean resultOrdered;
   // SQL类型，INSERT/SELECT/DELETE/UPDATE
   private SqlCommandType sqlCommandType;

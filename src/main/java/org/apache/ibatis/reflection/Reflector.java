@@ -46,6 +46,9 @@ import org.apache.ibatis.reflection.property.PropertyNamer;
  * allows for easy mapping between property names and getter/setter methods.
  *
  * @author Clinton Begin
+ *
+ * @apiNote Reflector是MyBatis 中反射模块的基础，每个Reflector 对象都对应一个类，在Reflector 中
+ * 缓存了反射操作需要使用的类的元信息。
  */
 public class Reflector {
 
