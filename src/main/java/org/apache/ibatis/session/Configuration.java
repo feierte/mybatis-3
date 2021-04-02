@@ -159,7 +159,8 @@ public class Configuration {
   protected final Map<String, MappedStatement> mappedStatements = new StrictMap<MappedStatement>("Mapped Statements collection")
       .conflictMessageProducer((savedValue, targetValue) ->
           ". please check " + savedValue.getResource() + " and " + targetValue.getResource());
-  // 二级缓存，key：mapper.xml中的namespace，mapper.xml中<cache/>标签配置的Cache就存放在这里
+  // 二级缓存，key：mapper.xml中的namespace，
+  // mapper.xml中<cache/>标签配置的Cache就存放在这里
   protected final Map<String, Cache> caches = new StrictMap<>("Caches collection");
   protected final Map<String, ResultMap> resultMaps = new StrictMap<>("Result Maps collection");
   protected final Map<String, ParameterMap> parameterMaps = new StrictMap<>("Parameter Maps collection");
@@ -848,6 +849,7 @@ public class Configuration {
   }
 
   public void addMappers(String packageName) {
+    // 扫描该包下所有的Mapper接口，并添加到mapperRegistry中
     mapperRegistry.addMappers(packageName);
   }
 

@@ -39,8 +39,8 @@ public class DynamicSqlTest {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       UserMapper mapper = sqlSession.getMapper(UserMapper.class);
       User parameter = new User(1, "张三", "");
-      List<User> users = mapper.selectUserByCondition(parameter);
-      System.out.println(users);
+      User user = mapper.selectUserByCondition(parameter);
+      System.out.println(user);
     }
   }
 }

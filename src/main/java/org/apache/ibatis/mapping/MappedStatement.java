@@ -51,6 +51,7 @@ public final class MappedStatement {
   private ResultSetType resultSetType;
   // 表示解析出来的SQL
   private SqlSource sqlSource;
+  // 二级缓存
   private Cache cache; // 执行CRUD时，所使用的缓存对象
   // 请求参数映射，已废弃，目前该属性已经被行内参数映射和parameterType属性所取代
   private ParameterMap parameterMap;

@@ -37,6 +37,7 @@ import org.apache.ibatis.transaction.Transaction;
  * @author Eduardo Macarron
  *
  * @apiNote 二级缓存（全局缓存）
+ * 二级缓存是构建在一级缓存之上，在收到查询请求时，MyBatis首先会查询二级缓存，若二级缓存未命中，再去查询一级缓存，一级缓存也没有，再去查询数据库。
  *
  * <p>读取mybatis-config全局配置文件的时候会根据我们配置的Executor类型来创建对应的三种Executor中的一种，然后如果我们开启了二级缓存之后，
  * 只要开启(全局配置文件中配置为true)就会使用CachingExecutor来对我们的三种基本Executor进行包装，即使Mapper.xml映射文件没有开启也会进行包装。

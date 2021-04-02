@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * @author Jie Zhao
@@ -39,12 +40,18 @@ public class CacheTest {
 
   @Test
   public void test() {
-    SqlSession sqlSession = sqlSessionFactory.openSession();
-    UserMapper mapper = sqlSession.getMapper(UserMapper.class);
-    User user1 = mapper.selectUser(1);
+    SqlSession sqlSession1 = sqlSessionFactory.openSession();
+    SqlSession sqlSession2 = sqlSessionFactory.openSession();
+    UserMapper mapper = sqlSession1.getMapper(UserMapper.class);
 
+    User parameter = new User(1, "张三", "");
+    User user1 = mapper.selectUserByCondition(parameter);
+    System.out.println(user1);
 
-    User user2 = mapper.selectUser(1);
+    sqlSession1.commit(); // 执行sqlSession的commit或者close方法才会将查询结果保存到二级缓存中去
+    // sqlSession1.close();
+
+    User user2 = sqlSession2.selectOne("org.apache.demo.mapper.UserMapper.selectUserByCondition", parameter);
     System.out.println(user1 == user2);
   }
 }

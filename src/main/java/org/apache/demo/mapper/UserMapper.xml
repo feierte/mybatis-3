@@ -11,17 +11,17 @@
   <!--
     useCache属性：用来本条sql设置是否禁用二级缓存的。设置useCache为false可以禁用当前select语句的二级缓存，
       即每次查询都会发出sql去查询数据库，默认值是true，即当前select语句使用二级缓存。
-    flushCache属性：默认情况下为true，即刷新缓存。
+    flushCache属性：默认情况下为true，表示针对该语句的每次执行都会刷新缓存。（该sql语句的每次执行都会清空缓存）
      -->
-  <select id="selectUserByCondition" parameterType="user" resultType="user"
-          useCache="true" flushCache="true">
+  <select id="selectUserByCondition" parameterType="user" resultMap="userResultMap"
+          useCache="true">
     select * from `user`
     <where>
       <if test="id != null">
-        and id = #{id}
+        and user_id = #{id}
       </if>
       <if test="username != null">
-        and username = #{username}
+        and user_name = #{username}
       </if>
     </where>
   </select>

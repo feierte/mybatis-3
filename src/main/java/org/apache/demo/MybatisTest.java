@@ -70,8 +70,8 @@ public class MybatisTest {
       UserMapper mapper = sqlSession.getMapper(UserMapper.class);
 
       User parameter = new User(1, "张三", "");
-      List<User> users = mapper.selectUserByCondition(parameter);
-      System.out.println(users);
+      User user1 = mapper.selectUserByCondition(parameter);
+      System.out.println(user1);
 
       User user = mapper.selectUser(1);
       System.out.println(user);

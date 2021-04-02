@@ -139,7 +139,9 @@ public abstract class BaseExecutor implements Executor {
 
   @Override
   public <E> List<E> query(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler) throws SQLException {
+    // 根据传入的参数动态的获取sql语句，最后返回的是BoundSql对象
     BoundSql boundSql = ms.getBoundSql(parameter);
+    // 为本次查询创建缓存的key
     CacheKey key = createCacheKey(ms, parameter, rowBounds, boundSql);
     return query(ms, parameter, rowBounds, resultHandler, key, boundSql);
   }
@@ -155,7 +157,7 @@ public abstract class BaseExecutor implements Executor {
     if (closed) {
       throw new ExecutorException("Executor was closed.");
     }
-    // mapper.xml的sql块上配置了flushCache=true，前置清空
+    // queryStack为0 && mapper.xml的sql块上配置了flushCache=true，前置清空缓存
     if (queryStack == 0 && ms.isFlushCacheRequired()) {
       clearLocalCache();
     }
@@ -347,13 +349,18 @@ public abstract class BaseExecutor implements Executor {
 
   private <E> List<E> queryFromDatabase(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
     List<E> list;
+    // 在缓存中，添加占位对象。此处的占位符和延迟加载有关，可见 DeferredLoad#canLoad() 方法
     localCache.putObject(key, EXECUTION_PLACEHOLDER);
     try {
+      // 执行数据库读操作
       list = doQuery(ms, parameter, rowBounds, resultHandler, boundSql);
     } finally {
+      // 从缓存中，移除占位对象
       localCache.removeObject(key);
     }
+    // 将查询结果缓存到缓存中
     localCache.putObject(key, list);
+    // 暂时忽略，此处和存储过程相关
     if (ms.getStatementType() == StatementType.CALLABLE) {
       localOutputParameterCache.putObject(key, parameter);
     }

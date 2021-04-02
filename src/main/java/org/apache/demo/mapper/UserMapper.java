@@ -13,5 +13,5 @@ public interface UserMapper {
     User selectUser(Integer id);
     User selectUserByConstructor(Integer id);
 
-    List<User> selectUserByCondition(User user);
+    User selectUserByCondition(User user);
 }
