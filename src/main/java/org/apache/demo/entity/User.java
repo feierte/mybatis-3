@@ -1,6 +1,7 @@
 package org.apache.demo.entity;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author jie zhao
@@ -16,7 +17,17 @@ public class User implements Serializable {
     private String face;
     private Integer proId;
 
-    public User() {
+    private List<Order> orders;
+
+  public List<Order> getOrders() {
+    return orders;
+  }
+
+  public void setOrders(List<Order> orders) {
+    this.orders = orders;
+  }
+
+  public User() {
     }
 
     public User(Integer id, String username, String password) {

@@ -176,6 +176,7 @@ public abstract class BaseExecutor implements Executor {
       queryStack--;
     }
     if (queryStack == 0) {
+      // 延迟加载
       for (DeferredLoad deferredLoad : deferredLoads) {
         deferredLoad.load();
       }
@@ -381,6 +382,27 @@ public abstract class BaseExecutor implements Executor {
     this.wrapper = wrapper;
   }
 
+  /**
+   * 延迟加载：就是在需要用到数据时才进行加载，不需要用到数据时就不加载数据。延迟加载也称为懒加载。
+   * <p>问题：在开发过程中很多时候我们并不需要总是在加载用户信息时就一定要加载他的订单信息。此时就是我们说的延迟加载。
+   * <p>示例:
+   * 在一对多中，当我们有一个用户，它有100个订单：
+   *  （1）、在查询用户的时候，要不要把关联的订单查出来？
+   *  （2）、在查询订单的时候，要不要把关联的用户查出来？
+   *
+   * 答：在查询用户时，用户下的订单应该是，什么时候用，什么时候查询。
+   *    在查询订单时，订单所属的用户信息应该是随着订单一起查询出来。
+   *
+   * <p>优点：先从单表查询，需要时在从关联表去关联查询，大大提高数据库性能，因为查询单表要比关联查询多张表速度要快。
+   *    缺点：因为只有当需要用到数据时，才会进行数据库查询，这样在大批量数据查询时，因为查询工作也需要消耗时间，所以可能造成用户等待时间变长，造成用户体验下降。
+   *
+   * <p>应用场景：
+   *    一对多，多对多：通常情况下采用延迟加载。
+   *    一对一（多对一）：通常情况下采用立即加载。
+   *
+   * <p>注意事项：
+   *   延迟加载是基于嵌套查询来实现的
+   */
   private static class DeferredLoad {
 
     private final MetaObject resultObject;

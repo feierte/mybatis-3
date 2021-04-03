@@ -5,8 +5,18 @@ public class Order {
   private Integer id;
   private Double price;
   private Double gpsy; // 随便造的一个属性
+  private Integer uid;
 
   private User user;
+
+  public Integer getUid() {
+    return uid;
+  }
+
+  public void setUid(Integer uid) {
+    this.uid = uid;
+  }
+
   public Integer getId() {
     return id;
   }

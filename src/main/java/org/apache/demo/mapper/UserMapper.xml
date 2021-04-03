@@ -83,4 +83,25 @@
       SELECT * FROM `user` WHERE user_id = #{id}
   </select>-->
 
+
+  <!-- 延迟加载示例 -->
+  <select id="findById" resultMap="deferResultMap">
+    select * from `user` where user_id = #{id}
+  </select>
+
+  <resultMap id="deferResultMap" type="User">
+    <id property="id" column="user_id"></id>
+    <result property="username" column="user_name"></result>
+
+    <!-- 一对多关联查询 -->
+    <!-- select和column用于实现延迟加载 -->
+    <collection property="orders" ofType="org.apache.demo.entity.Order"
+                select="org.apache.demo.mapper.OrderMapper.findOrderByUid" column="user_id"
+                fetchType="lazy"> <!-- 通过 fetchType属性实现局部加载
+                                    fetchType属性：表示加载策略，lazy：延迟加载，eager：立即加载 -->
+      <id property="id" column="id"></id>
+      <result property="price" column="price"></result>
+      <result property="gpsy" column="gpsy"></result>
+    </collection>
+  </resultMap>
 </mapper>
