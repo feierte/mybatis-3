@@ -22,9 +22,17 @@ import org.apache.ibatis.cache.decorators.TransactionalCache;
 
 /**
  * @author Clinton Begin
+ *
+ * @apiNote 事务缓存管理器
  */
 public class TransactionalCacheManager {
 
+  // 缓存Cache与TransactionalCache 的映射关系
+  // 从这里可以看出Cache是键，是为了取出TransactionalCache，所以二级缓存真正起作用的地方是TransactionalCache这个类。
+  // 为什么要这样做呢？
+  // 从源码可知，二级缓存是从MappedStatement对象中获取的，由于MappedStatement存在于全局配置中，可以被多个CachingExecutor获取到，
+  // 这样就会出现线程安全问题。除此之外，若不加以控制，多个事务共用一个缓存实例，会导致脏读，
+  // 至于脏读问题，需要借助TransactionalCacheManager类来处理，这就是为什么二级缓存会将查询结果先缓存到临时地方，等到commit或者close时，才会将结果存储到二级缓存中。
   private final Map<Cache, TransactionalCache> transactionalCaches = new HashMap<>();
 
   public void clear(Cache cache) {
@@ -32,6 +40,7 @@ public class TransactionalCacheManager {
   }
 
   public Object getObject(Cache cache, CacheKey key) {
+    // 从TransactionalCache中获取缓存
     return getTransactionalCache(cache).getObject(key);
   }
 

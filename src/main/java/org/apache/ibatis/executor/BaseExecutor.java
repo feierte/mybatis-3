@@ -164,7 +164,7 @@ public abstract class BaseExecutor implements Executor {
     List<E> list;
     try {
       queryStack++;
-      // resultHandler为空，先查本地缓存，注意这里的 本地缓存是同一个session内的缓存，也就是同一个open session内。
+      // resultHandler为空，先查本地缓存（一级缓存），注意这里的 本地缓存是同一个session内的缓存，也就是同一个open session内。
       list = resultHandler == null ? (List<E>) localCache.getObject(key) : null;
       if (list != null) {
         handleLocallyCachedOutputParameters(ms, key, parameter, boundSql);
@@ -358,7 +358,7 @@ public abstract class BaseExecutor implements Executor {
       // 从缓存中，移除占位对象
       localCache.removeObject(key);
     }
-    // 将查询结果缓存到缓存中
+    // 将查询结果缓存到一级缓存中
     localCache.putObject(key, list);
     // 暂时忽略，此处和存储过程相关
     if (ms.getStatementType() == StatementType.CALLABLE) {

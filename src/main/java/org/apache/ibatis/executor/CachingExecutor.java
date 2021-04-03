@@ -140,12 +140,14 @@ public class CachingExecutor implements Executor {
       throws SQLException {
     Cache cache = ms.getCache();
     if (cache != null) {
+      // 如果sql语句中配置了 flushCache=true，就会执行刷新缓存
       flushCacheIfRequired(ms);
       if (ms.isUseCache() && resultHandler == null) {
-        ensureNoOutParams(ms, boundSql);
+        ensureNoOutParams(ms, boundSql); // 存储过程相关的，可忽略
         @SuppressWarnings("unchecked")
-        List<E> list = (List<E>) tcm.getObject(cache, key);
+        List<E> list = (List<E>) tcm.getObject(cache, key); // 从二级缓存中获取结果
         if (list == null) {
+          // 二级缓存不存在，就执行查询，这个查询实际也是先走一级缓存查询，一级缓存没有的话，就走数据库查询
           list = delegate.query(ms, parameterObject, rowBounds, resultHandler, key, boundSql);
           // 注意，二级缓存存储的时候会先存储到一个临时属性中，直到事务提交才保存到真实的二级缓存中，目的是防止脏读
           tcm.putObject(cache, key, list); // issue #578 and #116
