@@ -51,9 +51,9 @@ public class TransactionalCache implements Cache {
    * 清理后{@link #clear()}时，该值为true，表示持续处于清空状态
    */
   private boolean clearOnCommit; // true表示提交事务的时候就清除缓存
-  // 事务被提交前，所有从数据库中查询的结果将缓存在这个集合中
+  // 事务被提交前或SqlSession关闭前，所有从数据库中查询的结果将缓存在这个集合中
   private final Map<Object, Object> entriesToAddOnCommit; // 这里记录了临时缓存，当commit的时候会将其加入到二级缓存中
-  // 事务被提交前，当缓存未命中时，CacheKey将会被存储在此集合中
+  // 事务被提交前或SqlSession关闭前，当缓存未命中时，CacheKey将会被存储在此集合中
   private final Set<Object> entriesMissedInCache; // 记录了未命中缓存的key
 
   public TransactionalCache(Cache delegate) {

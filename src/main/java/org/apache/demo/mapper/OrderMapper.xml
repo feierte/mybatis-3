@@ -8,6 +8,7 @@
     <id property="id" column="id"></id>
     <result property="price" column="price"></result>
 
+    <!-- 一对一关联查询 -->
     <association property="user" javaType="org.apache.demo.entity.User">
       <id property="id" column="user_id"></id>
       <result property="username" column="user_name"></result>
