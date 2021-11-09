@@ -115,10 +115,13 @@ public class MapperAnnotationBuilder {
   public void parse() {
     String resource = type.toString();
     if (!configuration.isResourceLoaded(resource)) {
+      // 加载该接口对应的 XML 文件
       loadXmlResource();
       configuration.addLoadedResource(resource);
       assistant.setCurrentNamespace(type.getName());
+      // 解析 Mapper 接口的 @CacheNamespace 注解，创建缓存
       parseCache();
+      // 解析 Mapper 接口的 @CacheNamespaceRef 注解，引用其他命名空间
       parseCacheRef();
       for (Method method : type.getMethods()) {
         if (!canHaveStatement(method)) {
@@ -129,6 +132,7 @@ public class MapperAnnotationBuilder {
           parseResultMap(method);
         }
         try {
+          // 解析方法上面的注解
           parseStatement(method);
         } catch (IncompleteElementException e) {
           configuration.addIncompleteMethod(new MethodResolver(this, method));

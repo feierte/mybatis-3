@@ -39,14 +39,16 @@ import org.apache.ibatis.transaction.Transaction;
  * @apiNote 二级缓存（全局缓存）
  * 二级缓存是构建在一级缓存之上，在收到查询请求时，MyBatis首先会查询二级缓存，若二级缓存未命中，再去查询一级缓存，一级缓存也没有，再去查询数据库。
  *
- * <p>读取mybatis-config全局配置文件的时候会根据我们配置的Executor类型来创建对应的三种Executor中的一种，然后如果我们开启了二级缓存之后，
- * 只要开启(全局配置文件中配置为true)就会使用CachingExecutor来对我们的三种基本Executor进行包装，即使Mapper.xml映射文件没有开启也会进行包装。
+ * <p>读取 mybatis-config 全局配置文件的时候会根据我们配置的 Executor 类型来创建对应的三种 Executor 中的一种，然后如果我们开启了二级缓存之后，
+ * 只要开启(全局配置文件中配置为true)就会使用 CachingExecutor 来对我们的三种基本 Executor 进行包装，即使 Mapper.xml 映射文件没有开启也会进行包装。
  *
  * <p>二级缓存
- * 一级缓存因为只能在同一个SqlSession中共享，所以会存在一个问题，在分布式或者多线程的环境下，不同会话之间对于相同的数据可能会产生不同的结果，因为跨会话修改了数据是不能互相感知的，所以就有可能存在脏数据的问题，正因为一级缓存存在这种不足，所以我们需要一种作用域更大的缓存，这就是二级缓存。
+ * 一级缓存因为只能在同一个 SqlSession 中共享，所以会存在一个问题，在分布式或者多线程的环境下，不同会话之间对于相同的数据可能会产生不同的结果，
+ * 因为跨会话修改了数据是不能互相感知的，所以就有可能存在脏数据的问题，正因为一级缓存存在这种不足，所以我们需要一种作用域更大的缓存，这就是二级缓存。
  *
  * <p>二级缓存的作用范围
- * 一级缓存作用域是SqlSession级别，所以它存储的SqlSession中的BaseExecutor之中，但是二级缓存目的就是要实现作用范围更广，那肯定是要实现跨会话共享的，在MyBatis中二级缓存的作用域是namespace，也就是作用范围是同一个命名空间，所以很显然二级缓存是需要存储在SqlSession之外的，那么二级缓存应该存储在哪里合适呢？
+ * 一级缓存作用域是 SqlSession 级别，所以它存储的 SqlSession 中的 BaseExecutor 之中，但是二级缓存目的就是要实现作用范围更广，那肯定是要实现跨会话共享的，
+ * 在 MyBatis 中二级缓存的作用域是 namespace，也就是作用范围是同一个命名空间，所以很显然二级缓存是需要存储在 SqlSession 之外的，那么二级缓存应该存储在哪里合适呢？
  *
  * 在MyBatis中为了实现二级缓存，专门用了一个装饰器来维护，这就是：CachingExecutor。
  *
@@ -78,8 +80,8 @@ import org.apache.ibatis.transaction.Transaction;
  * <p>自定义缓存
  * 一级缓存可能存在脏读情况，那么二级缓存是否也可能存在呢？
  * 是的，默认的二级缓存毕竟也是存储在本地缓存，所以对于微服务下是可能出现脏读的情况的，所以这时候我们可能会需要自定义缓存，
- * 比如利用redis来存储缓存，而不是存储在本地内存当中。
- * MyBatis官方提供的第三方缓存，如：MyBatis官方提供的第三方缓存mybatis-redis
+ * 比如利用 redis 来存储缓存，而不是存储在本地内存当中。
+ * MyBatis 官方提供的第三方缓存，如：MyBatis 官方提供的第三方缓存 mybatis-redis
  */
 public class CachingExecutor implements Executor {
 

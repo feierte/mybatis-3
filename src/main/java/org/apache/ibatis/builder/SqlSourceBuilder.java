@@ -93,10 +93,10 @@ public class SqlSourceBuilder extends BaseBuilder {
     }
 
     /**
-     * 完成对#{}解析工作：
-     *  1、将#{}用？代替
-     *  2、解析出#{}里面的值进行存储
-     * @param content 被#{}包裹的变量，例如：#{id}中的id
+     * 完成对 #{} 解析工作：
+     *  1、将 #{} 用 ？ 代替
+     *  2、解析出 #{} 里面的值进行存储
+     * @param content 被 #{} 包裹的变量，例如：#{id} 中的 id
      * @return
      */
     @Override

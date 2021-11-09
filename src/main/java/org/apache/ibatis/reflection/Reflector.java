@@ -47,7 +47,7 @@ import org.apache.ibatis.reflection.property.PropertyNamer;
  *
  * @author Clinton Begin
  *
- * @apiNote Reflector是MyBatis 中反射模块的基础，每个Reflector 对象都对应一个类，在Reflector 中
+ * @apiNote Reflector 是 MyBatis 中反射模块的基础，每个 Reflector 对象都对应一个类，在 Reflector 中
  * 缓存了反射操作需要使用的类的元信息。
  */
 public class Reflector {
@@ -65,8 +65,14 @@ public class Reflector {
   private final Map<String, Class<?>> setTypes = new HashMap<>();
   // 记录了属性相应get方法的参数类型,key是属性名，value是get方法的参数类型
   private final Map<String, Class<?>> getTypes = new HashMap<>();
+  // type 类型对应的 默认无参构造方法
   private Constructor<?> defaultConstructor;
 
+  /**
+   * 所有属性集合
+   * key 为全大写的属性名称
+   * value 为属性名称
+   */
   private Map<String, String> caseInsensitivePropertyMap = new HashMap<>();
 
   public Reflector(Class<?> clazz) {
@@ -74,6 +80,7 @@ public class Reflector {
     addDefaultConstructor(clazz);
     addGetMethods(clazz);
     addSetMethods(clazz);
+    // 可能有些属性没有get或者set方法，则直接将该Field字段封装成SetFieldInvoker或者GetFieldInvoker，然后分别保存至上面4个变量中
     addFields(clazz);
     readablePropertyNames = getMethods.keySet().toArray(new String[0]);
     writablePropertyNames = setMethods.keySet().toArray(new String[0]);

@@ -28,6 +28,8 @@ import org.apache.ibatis.reflection.property.PropertyTokenizer;
 
 /**
  * @author Clinton Begin
+ *
+ * @apiNote 包装 Reflector，基于 PropertyTokenizer（分词器）提供对Class类的元数据一些操作，可以理解成对 Reflector 操作的进一步增强。
  */
 public class MetaClass {
 

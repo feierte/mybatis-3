@@ -703,6 +703,7 @@ public class Configuration {
     } else {
       executor = new SimpleExecutor(this, transaction);
     }
+    // 判断 mybatis 全局配置文件是否开启 二级缓存
     if (cacheEnabled) {
       executor = new CachingExecutor(executor);
     }

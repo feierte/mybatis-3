@@ -31,6 +31,9 @@ import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
+/**
+ * 方法参数名称解析器，用于解析我们定义的 Mapper 接口的方法
+ */
 public class ParamNameResolver {
 
   public static final String GENERIC_NAME_PREFIX = "param";
@@ -50,13 +53,24 @@ public class ParamNameResolver {
    * <li>aMethod(int a, RowBounds rb, int b) -&gt; {{0, "0"}, {2, "1"}}</li>
    * </ul>
    *
-   * @apiNote 根据接口方法按顺序记录下接口参数的定义的名字，如果使用@Param指定了名字，就会记录这个名字，
+   * @apiNote 根据接口方法按顺序记录下接口参数的定义的名字，如果使用 @Param 指定了名字，就会记录这个名字，
    * 如果没有记录，那么就会使用它的序号作为名字。
    */
   private final SortedMap<Integer, String> names;
 
   private boolean hasParamAnnotation;
 
+
+  /**
+   * 在构造函数中可以看到，目的是获取到该方法的参数名，将参数顺序与参数名进行映射保存在UnmodifiableSortedMap一个不可变的SortedMap集合中，大致逻辑：
+   *  1、如果添加了@Param注解，则参数名称为该注解的value值。
+   *  2、没有添加@Param注解则尝试获取真实的参数名。
+   *    说明：通过反射获取方法的参数名，我们只能获取到 arg0,arg1 的名称，因为jdk8之后这些变量名称没有被编译到class文件中，编译时需要指定-parameters选项，
+   *    方法的参数名才会记录到class文件中，运行时我们就可以通过反射机制获取到。
+   *  3、还是没有获取到参数名则使用序号标记，一般不会走到这一步。
+   * @param config
+   * @param method
+   */
   public ParamNameResolver(Configuration config, Method method) {
     this.useActualParamName = config.isUseActualParamName();
     final Class<?>[] paramTypes = method.getParameterTypes();
@@ -121,6 +135,11 @@ public class ParamNameResolver {
    * @param args
    *          the args
    * @return the named params
+   *
+   * @apiNote 根据实际入参数组返回参数名与参数值的映射，大致逻辑：
+   *  1、实际参数为 null 或者参数个数为 0，则直接返回 null
+   *  2、没有使用 @Param 注解并且参数个数为 1，则直接返回参数值
+   *  3、根据参数顺序与参数名的映射获取到参数名与参数值的映射，而且还会将（param+参数顺序）与参数值进行映射，最后将两种组合的映射返回
    */
   public Object getNamedParams(Object[] args) {
     final int paramCount = names.size();

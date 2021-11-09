@@ -32,7 +32,7 @@ import org.apache.ibatis.session.Configuration;
  * @author Clinton Begin
  *
  * @apiNote
- * 一个MappedStatement对象对应一个mapper.xml中的一个SQL节点（select、insert、update、delete）
+ * 一个 MappedStatement 对象对应一个 mapper.xml 中的一个SQL节点（select、insert、update、delete）
  */
 public final class MappedStatement {
 

@@ -96,14 +96,21 @@ public class XMLMapperBuilder extends BaseBuilder {
   }
 
   public void parse() {
+    // 判断当前 Mapper xml 文件是否已经加载过
     if (!configuration.isResourceLoaded(resource)) {
+      // 解析 <mapper /> 节点
       configurationElement(parser.evalNode("/mapper"));
+      // 标记该 Mapper xml 文件已经加载过了
       configuration.addLoadedResource(resource);
+      // 绑定 Mapper
       bindMapperForNamespace();
     }
 
+    // 解析待定的 <resultMap /> 节点
     parsePendingResultMaps();
+    // 解析待定的 <cache-ref /> 节点
     parsePendingCacheRefs();
+    // 解析待定的 SQL 语句的节点
     parsePendingStatements();
   }
 
@@ -113,15 +120,21 @@ public class XMLMapperBuilder extends BaseBuilder {
 
   private void configurationElement(XNode context) {
     try {
+      // 获取 namespace 属性
       String namespace = context.getStringAttribute("namespace");
       if (namespace == null || namespace.isEmpty()) {
         throw new BuilderException("Mapper's namespace cannot be empty");
       }
       builderAssistant.setCurrentNamespace(namespace);
+      // 解析 <cache-ref /> 节点
       cacheRefElement(context.evalNode("cache-ref"));
+      // 解析 <cache /> 节点
       cacheElement(context.evalNode("cache"));
+      // 已废弃！老式风格的参数映射。内联参数是首选,这个元素可能在将来被移除，这里不会记录。
       parameterMapElement(context.evalNodes("/mapper/parameterMap"));
+      // 解析 <resultMap /> 节点
       resultMapElements(context.evalNodes("/mapper/resultMap"));
+      // 解析 <sql /> 节点们
       sqlElement(context.evalNodes("/mapper/sql"));
       // 解析 <select/> <insert/> <update/> <delete/>节点们
       // 这里还会将生成的Cache包装到对应的MappedStatement
@@ -199,9 +212,12 @@ public class XMLMapperBuilder extends BaseBuilder {
 
   private void cacheRefElement(XNode context) {
     if (context != null) {
+      // <1> 获得指向的 namespace 名字，并添加到 configuration 的 cacheRefMap 中
       configuration.addCacheRef(builderAssistant.getCurrentNamespace(), context.getStringAttribute("namespace"));
+      // <2> 创建 CacheRefResolver 对象
       CacheRefResolver cacheRefResolver = new CacheRefResolver(builderAssistant, context.getStringAttribute("namespace"));
       try {
+        // 执行解析，获取引用的缓存对象到自己这里
         cacheRefResolver.resolveCacheRef();
       } catch (IncompleteElementException e) {
         configuration.addIncompleteCacheRef(cacheRefResolver);
@@ -211,15 +227,20 @@ public class XMLMapperBuilder extends BaseBuilder {
 
   private void cacheElement(XNode context) {
     if (context != null) {
+      // <1> 获得负责存储的 Cache 实现类
       String type = context.getStringAttribute("type", "PERPETUAL");
       Class<? extends Cache> typeClass = typeAliasRegistry.resolveAlias(type);
+      // <2> 获得负责过期的 Cache 实现类
       String eviction = context.getStringAttribute("eviction", "LRU");
       Class<? extends Cache> evictionClass = typeAliasRegistry.resolveAlias(eviction);
+      // <3> 获得 flushInterval、size、readWrite、blocking 属性
       Long flushInterval = context.getLongAttribute("flushInterval");
       Integer size = context.getIntAttribute("size");
       boolean readWrite = !context.getBooleanAttribute("readOnly", false);
       boolean blocking = context.getBooleanAttribute("blocking", false);
+      // <4> 获得 Properties 属性
       Properties props = context.getChildrenAsProperties();
+      // <5> 创建 Cache 对象
       builderAssistant.useNewCache(typeClass, evictionClass, flushInterval, size, readWrite, blocking, props);
     }
   }

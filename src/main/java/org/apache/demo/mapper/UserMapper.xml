@@ -42,9 +42,9 @@
     这会让 MyBatis 分别使用 Statement，PreparedStatement 或 CallableStatement，默认值：PREPARED。
    -->
   <select id="selectUser" resultType="User" statementType="PREPARED">
-    SELECT user_id AS "id", user_name AS "username"
+    SELECT id AS "id", username AS "username"
     FROM `user`
-    WHERE user_id = #{id}
+    WHERE id= #{id}
   </select>
 
   <select id="selectUserByConstructor" resultMap="userResultMap">

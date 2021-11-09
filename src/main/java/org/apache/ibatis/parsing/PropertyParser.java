@@ -20,6 +20,10 @@ import java.util.Properties;
 /**
  * @author Clinton Begin
  * @author Kazuki Shimizu
+ *
+ * @apiNote 动态属性解析器
+ *
+ * <p>用于解析XML文件中的动态值，根据GenericTokenParser获取动态属性的名称（例如${name}->name），然后通过VariableTokenHandler根据Properties对象获取到动态属性（name）对应的值
  */
 public class PropertyParser {
 

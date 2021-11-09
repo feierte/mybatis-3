@@ -36,8 +36,8 @@ public class MapperRegistry {
   private final Configuration config;
 
   /**
-   * key: mapper接口的class对象
-   * value: MapperProxyFactory用于生成mapper接口的代理类
+   * key: mapper 接口的 class 对象
+   * value: MapperProxyFactory，用于生成 mapper 接口的代理类
    */
   private final Map<Class<?>, MapperProxyFactory<?>> knownMappers = new HashMap<>();
 
@@ -75,8 +75,11 @@ public class MapperRegistry {
         // It's important that the type is added before the parser is run
         // otherwise the binding may automatically be attempted by the
         // mapper parser. If the type is already known, it won't try.
+        // 生成 MapperAnnotationBuilder 对象，用于解析 Mapper 接口上的注解配置
         MapperAnnotationBuilder parser = new MapperAnnotationBuilder(config, type);
+        // 解析 Mapper 接口上面的注解和 Mapper 接口对应的 XML 文件
         parser.parse();
+        // 标记加载完成
         loadCompleted = true;
       } finally {
         if (!loadCompleted) {

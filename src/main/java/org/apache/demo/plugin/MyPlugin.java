@@ -9,7 +9,7 @@ import java.sql.Connection;
  * @author Jie Zhao
  * @date 2021/3/27 13:52
  */
-@Intercepts({ // 注意看这个大括号，也就是说这里可以定义多个@Signature对多个地方拦截，都用这个拦截器
+@Intercepts({ // 注意看这个大括号，也就是说这里可以定义多个 @Signature 对多个地方拦截，都用这个拦截器
   @Signature(type = StatementHandler.class, // 这是指拦截哪个接口
     method = "prepare", // 拦截这个接口内的哪个方法，注意方法名不要拼错了
     args = {Connection.class, Integer.class} // 这是拦截方法的入参，按顺序写到这里，不要多也不要少，如果方法重载，可以通过方法名和入参来唯一确定的

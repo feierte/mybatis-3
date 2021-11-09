@@ -50,6 +50,7 @@ public class XPathParser {
   private boolean validation;
   private EntityResolver entityResolver;
   private Properties variables;
+  // 用于产需 XML 文件中的节点和元素
   private XPath xpath;
 
   public XPathParser(String xml) {
