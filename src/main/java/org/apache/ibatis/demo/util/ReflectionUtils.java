@@ -13,6 +13,7 @@ public abstract class ReflectionUtils {
 
   /**
    * 加载指定 package 下的所有 classes
+   *
    * @param packageName 指定 package 的名称
    * @param classLoader 加载 classes 使用的类加载器
    * @return 返回 classes 列表
@@ -23,6 +24,7 @@ public abstract class ReflectionUtils {
     URL resource = classLoader.getResource(packageName);
 
     List<Class<?>> result = new ArrayList<>();
+    assert resource != null;
     List<File> files = FileUtils.findFilesInDir(resource.getFile());
     if (CollectionUtils.isNotEmpty(files)) {
       PackageClassLoader packageClassLoader = new PackageClassLoader(classLoader, files);

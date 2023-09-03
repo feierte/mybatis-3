@@ -9,8 +9,8 @@ import java.util.Date;
  */
 @Data
 public class Order {
-  private int id;
+  private Integer id;
   private Date orderTime;
-  private double total;
+  private Double total;
   private User user;
 }
