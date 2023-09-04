@@ -15,33 +15,11 @@
  */
 package org.apache.ibatis.builder.xml;
 
-import java.io.InputStream;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import org.apache.ibatis.builder.BaseBuilder;
-import org.apache.ibatis.builder.BuilderException;
-import org.apache.ibatis.builder.CacheRefResolver;
-import org.apache.ibatis.builder.IncompleteElementException;
-import org.apache.ibatis.builder.MapperBuilderAssistant;
-import org.apache.ibatis.builder.ResultMapResolver;
+import org.apache.ibatis.builder.*;
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.executor.ErrorContext;
 import org.apache.ibatis.io.Resources;
-import org.apache.ibatis.mapping.Discriminator;
-import org.apache.ibatis.mapping.ParameterMapping;
-import org.apache.ibatis.mapping.ParameterMode;
-import org.apache.ibatis.mapping.ResultFlag;
-import org.apache.ibatis.mapping.ResultMap;
-import org.apache.ibatis.mapping.ResultMapping;
+import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.parsing.XPathParser;
 import org.apache.ibatis.reflection.MetaClass;
@@ -49,13 +27,21 @@ import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 
+import java.io.InputStream;
+import java.io.Reader;
+import java.util.*;
+
 /**
  * @author Clinton Begin
  * @author Kazuki Shimizu
+ *
+ * @apiNote XMLMapperBuilder 中会将 mapper 映射文件中除 CRUD 外的标签解析验证，轮到 CRUD 标签的时候，是交给专门的类去做处理的，也就是 XMLStatementBuilder。
  */
 public class XMLMapperBuilder extends BaseBuilder {
 
   private final XPathParser parser;
+
+  // 存储 mapper.xml 文件解析后的数据，在解析完成后，用解析所得的属性来帮助创建各个对象
   private final MapperBuilderAssistant builderAssistant;
   private final Map<String, XNode> sqlFragments;
   private final String resource;
@@ -96,14 +82,21 @@ public class XMLMapperBuilder extends BaseBuilder {
   }
 
   public void parse() {
+    // 判断当前 Mapper xml 文件是否已经加载过
     if (!configuration.isResourceLoaded(resource)) {
+      // 解析 <mapper/> 节点
       configurationElement(parser.evalNode("/mapper"));
+      // 标记该 Mapper xml 文件已经加载过了
       configuration.addLoadedResource(resource);
+      // 绑定 Mapper
       bindMapperForNamespace();
     }
 
+    // 解析待定的 <resultMap/> 节点
     parsePendingResultMaps();
+    // 解析待定的 <cache-ref/> 节点
     parsePendingCacheRefs();
+    // 解析待定的 SQL 语句的节点
     parsePendingStatements();
   }
 

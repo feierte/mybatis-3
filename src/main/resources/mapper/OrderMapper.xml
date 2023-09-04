@@ -5,7 +5,7 @@
 
 <mapper namespace="org.apache.ibatis.demo.mapper.OrderMapper">
 
-    <!-- 配置方式二： 使用association -->
+    <!-- 配置方式一： 使用association -->
     <resultMap id="orderMap" type="org.apache.ibatis.demo.domain.Order">
         <result property="id" column="id"></result>
         <result property="orderTime" column="order_time"></result>
