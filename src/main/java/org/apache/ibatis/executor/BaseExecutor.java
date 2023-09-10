@@ -15,14 +15,6 @@
  */
 package org.apache.ibatis.executor;
 
-import static org.apache.ibatis.executor.ExecutionPlaceholder.EXECUTION_PLACEHOLDER;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.cache.impl.PerpetualCache;
 import org.apache.ibatis.cursor.Cursor;
@@ -30,11 +22,7 @@ import org.apache.ibatis.executor.statement.StatementUtil;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
 import org.apache.ibatis.logging.jdbc.ConnectionLogger;
-import org.apache.ibatis.mapping.BoundSql;
-import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.mapping.ParameterMapping;
-import org.apache.ibatis.mapping.ParameterMode;
-import org.apache.ibatis.mapping.StatementType;
+import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.factory.ObjectFactory;
 import org.apache.ibatis.session.Configuration;
@@ -43,6 +31,14 @@ import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.transaction.Transaction;
 import org.apache.ibatis.type.TypeHandlerRegistry;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+import static org.apache.ibatis.executor.ExecutionPlaceholder.EXECUTION_PLACEHOLDER;
 
 /**
  * @author Clinton Begin
@@ -55,7 +51,15 @@ public abstract class BaseExecutor implements Executor {
   protected Executor wrapper;
 
   protected ConcurrentLinkedQueue<DeferredLoad> deferredLoads;
+  /**
+   * 一级缓存（本地缓存），默认开启的，不需要任何配置：会话级缓存，生命周期是整个会话 SqlSession，非常短暂，不能直接关闭，不能跨线程使用。
+   * 注意这里的 本地缓存是同一个 session 内的缓存，也就是同一个 open session 内。
+   *
+   * <p>修改（执行 sql 前清空缓存）、查询（mapper.xml 的 sql 块上配置了一级缓存作用域 statementType="STATEMENT"，后置清空）、
+   * 提交（提交前清空缓存）、回滚（回滚前清空缓存），都可能会清空一级缓存。
+   */
   protected PerpetualCache localCache;
+  // 一级缓存：缓存输出参数
   protected PerpetualCache localOutputParameterCache;
   protected Configuration configuration;
 
@@ -145,6 +149,7 @@ public abstract class BaseExecutor implements Executor {
     if (closed) {
       throw new ExecutorException("Executor was closed.");
     }
+    // queryStack 主要用于递归调用 query() 方法时防止一级缓存被清空
     if (queryStack == 0 && ms.isFlushCacheRequired()) {
       clearLocalCache();
     }
@@ -166,6 +171,7 @@ public abstract class BaseExecutor implements Executor {
       }
       // issue #601
       deferredLoads.clear();
+      // 如果一级缓存作用范围是 STATEMENT 时，每次 query() 执行完毕就需要清空一级缓存
       if (configuration.getLocalCacheScope() == LocalCacheScope.STATEMENT) {
         // issue #482
         clearLocalCache();
@@ -207,6 +213,7 @@ public abstract class BaseExecutor implements Executor {
     List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
     TypeHandlerRegistry typeHandlerRegistry = ms.getConfiguration().getTypeHandlerRegistry();
     // mimic DefaultParameterHandler logic
+    // 基于查询参数更新 CacheKey
     for (ParameterMapping parameterMapping : parameterMappings) {
       if (parameterMapping.getMode() != ParameterMode.OUT) {
         Object value;
@@ -224,6 +231,7 @@ public abstract class BaseExecutor implements Executor {
         cacheKey.update(value);
       }
     }
+    // 基于 Environment 的 id 更新 CacheKey
     if (configuration.getEnvironment() != null) {
       // issue #176
       cacheKey.update(configuration.getEnvironment().getId());

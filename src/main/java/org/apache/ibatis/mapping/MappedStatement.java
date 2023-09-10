@@ -15,10 +15,6 @@
  */
 package org.apache.ibatis.mapping;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.executor.keygen.Jdbc3KeyGenerator;
 import org.apache.ibatis.executor.keygen.KeyGenerator;
@@ -28,33 +24,58 @@ import org.apache.ibatis.logging.LogFactory;
 import org.apache.ibatis.scripting.LanguageDriver;
 import org.apache.ibatis.session.Configuration;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * @author Clinton Begin
+ *
+ * @apiNote 一个 MappedStatement 对象对应一个 mapper.xml 中的一个 SQL 节点（select、insert、update、delete）
  */
 public final class MappedStatement {
 
+  // mapper映射文件的路径
   private String resource;
   private Configuration configuration;
+  // 节点的id属性加命名空间: namespace.id，如：com.lucky.mybatis.dao.UserMapper.selectByExample
   private String id;
+  // 尝试影响驱动程序每次批量返回的结果行数和这个设置值相等
   private Integer fetchSize;
+  // SQL超时时间
   private Integer timeout;
+  // Statement的类型，STATEMENT（直接操作SQL，不进行预编译）/PREPARE（预处理参数，进行预编译，获取数据）/CALLABLE（执行存储过程）
+  // 决定在操作数据库时（Executor中创建StatementHandler时起作用），使用的是Statement、PreparedStatement还是CallableStatement
   private StatementType statementType;
+  // 结果集类型，FORWARD_ONLY / SCROLL_SENSITIVE/SCROLL_INSENSITIVE
   private ResultSetType resultSetType;
+  // 表示解析出来的SQL
   private SqlSource sqlSource;
+  // 二级缓存，执行CRUD时，所使用的缓存对象
   private Cache cache;
+  // 请求参数映射，已废弃，目前该属性已经被行内参数映射和 parameterType 属性所取代
   private ParameterMap parameterMap;
+  // 对应 Mapper.xml 文件中的 resultMap
   private List<ResultMap> resultMaps;
+  // 控制在执行 sql 后，是否刷新缓存，对应 flushCache 属性
   private boolean flushCacheRequired;
+  // 控制在查询时，是否使用缓存，对应 useCache 属性
   private boolean useCache;
   private boolean resultOrdered;
+  // SQL类型，INSERT/SELECT/DELETE/UPDATE
   private SqlCommandType sqlCommandType;
   private KeyGenerator keyGenerator;
-  private String[] keyProperties;
-  private String[] keyColumns;
+  private String[] keyProperties; // java属性名称集合
+  private String[] keyColumns; // 数据列名称集合
+  // 是否存在嵌套映射结果集
   private boolean hasNestedResultMaps;
+  // 数据库ID，用来区分不同环境
+  // MyBatis 会加载带有匹配当前数据库的 databaseId 属性的语句和所有不带 databaseId 属性的语句。 如果同时找到带有
+  // databaseId 和不带 databaseId 的相同语句，则后者会被舍弃。
   private String databaseId;
   private Log statementLog;
-  private LanguageDriver lang;
+  private LanguageDriver lang; // 语言解释器
+  // 多结果集时
   private String[] resultSets;
   private boolean dirtySelect;
 

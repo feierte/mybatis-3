@@ -15,29 +15,42 @@
  */
 package org.apache.ibatis.executor.statement;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
-
 import org.apache.ibatis.cursor.Cursor;
 import org.apache.ibatis.executor.parameter.ParameterHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.session.ResultHandler;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.List;
 
 /**
  * @author Clinton Begin
  */
 public interface StatementHandler {
 
+  /**
+   * 用于创建一个具体的 Statement 对象的实现类（PreparedStatement）或者是 Statement 对象
+   */
   Statement prepare(Connection connection, Integer transactionTimeout) throws SQLException;
 
+  /**
+   * 用于初始化 Statement 对象以及对 sql 的占位符进行赋值（使用传入的实参替换 SQL 语句中的占位符 ?）
+   * 传到这里的 sql 是已经预编译的s ql，这里使用传入的实参替换 SQL 语句中的 ?
+   */
   void parameterize(Statement statement) throws SQLException;
 
   void batch(Statement statement) throws SQLException;
 
+  /**
+   * 用于通知 Statement 对象将 insert、update、delete 操作推送到数据库
+   */
   int update(Statement statement) throws SQLException;
 
+  /**
+   * 用于通知 Statement 对象将 select 操作推送数据库并返回对应的查询结果
+   */
   <E> List<E> query(Statement statement, ResultHandler resultHandler) throws SQLException;
 
   <E> Cursor<E> queryCursor(Statement statement) throws SQLException;

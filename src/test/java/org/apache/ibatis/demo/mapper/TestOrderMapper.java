@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertSame;
+
 public class TestOrderMapper {
 
   private static SqlSessionFactory sqlSessionFactory;
@@ -30,6 +32,25 @@ public class TestOrderMapper {
       OrderMapper orderMapper = sqlSession.getMapper(OrderMapper.class);
       List<Order> orders = orderMapper.findOrderAndUser();
       System.out.println(orders);
+    }
+  }
+
+  /**
+   * 测试 Mybatis 的一级缓存
+   */
+  @Test
+  public void testFirstLevelCache() {
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      OrderMapper orderMapper = sqlSession.getMapper(OrderMapper.class);
+      // 第一次查询
+      List<Order> orders1 = orderMapper.findOrderAndUser();
+      System.out.println(orders1);
+
+      // 第二次查询
+      List<Order> orders2 = orderMapper.findOrderAndUser();
+      System.out.println(orders2);
+      // assertNotSame(orders1, orders2);
+      assertSame(orders1, orders2);
     }
   }
 }
