@@ -15,18 +15,19 @@
  */
 package org.apache.ibatis.builder;
 
-import java.util.List;
-
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.mapping.SqlSource;
 import org.apache.ibatis.session.Configuration;
+
+import java.util.List;
 
 /**
  * @author Clinton Begin
  */
 public class StaticSqlSource implements SqlSource {
 
+  // 这里是解析后的 sql，即将 mapperx.xml 文件中原始 sql中的 #{} 使用占位符 ? 替换掉
   private final String sql;
   private final List<ParameterMapping> parameterMappings;
   private final Configuration configuration;

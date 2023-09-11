@@ -15,11 +15,6 @@
  */
 package org.apache.ibatis.builder;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.mapping.SqlSource;
 import org.apache.ibatis.parsing.GenericTokenParser;
@@ -28,6 +23,11 @@ import org.apache.ibatis.reflection.MetaClass;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.JdbcType;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 /**
  * @author Clinton Begin
@@ -40,6 +40,13 @@ public class SqlSourceBuilder extends BaseBuilder {
     super(configuration);
   }
 
+  /**
+   * 将原始 sql 中的 #{} 使用 占位符 ? 替换掉
+   * @param originalSql
+   * @param parameterType
+   * @param additionalParameters
+   * @return
+   */
   public SqlSource parse(String originalSql, Class<?> parameterType, Map<String, Object> additionalParameters) {
     ParameterMappingTokenHandler handler = new ParameterMappingTokenHandler(configuration, parameterType,
         additionalParameters);
@@ -84,12 +91,26 @@ public class SqlSourceBuilder extends BaseBuilder {
       return parameterMappings;
     }
 
+    /**
+     * 完成对 #{} 解析工作：
+     *  1、将 #{} 用 ？ 代替
+     *  2、解析出 #{} 里面的值进行存储
+     * @param content 被 #{} 包裹的变量，例如：#{id} 中的 id
+     * @return
+     */
     @Override
     public String handleToken(String content) {
       parameterMappings.add(buildParameterMapping(content));
       return "?";
     }
 
+    /**
+     * 1、解析传进来的 content 内容，看是否有变量，如果有从对应参数类中获取这个属性的类型，
+     * 2、解析其存在其他如 javaType 等参数设置到 ParameterMapping 内部的 Builder 方法中
+     * 3、通过 Builder 构建 ParameterMapping
+     * @param content 被 #{} 包裹的变量，例如：#{id} 中的 id
+     * @return
+     */
     private ParameterMapping buildParameterMapping(String content) {
       Map<String, String> propertiesMap = parseParameterMapping(content);
       String property = propertiesMap.get("property");

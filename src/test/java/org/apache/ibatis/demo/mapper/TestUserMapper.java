@@ -34,4 +34,14 @@ public class TestUserMapper {
       System.out.println(userAndRoles);
     }
   }
+
+
+  @Test
+  public void testFindUserById() {
+    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+      UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+      List<User> userAndRoles = userMapper.findUserById(1);
+      System.out.println(userAndRoles);
+    }
+  }
 }
