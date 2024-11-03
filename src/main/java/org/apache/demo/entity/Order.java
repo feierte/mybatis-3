@@ -15,62 +15,27 @@
  */
 package org.apache.demo.entity;
 
+import lombok.Data;
+import lombok.ToString;
+
+import java.util.List;
+
+@Data
+@ToString
 public class Order {
 
-  private Integer id;
   private Double price;
   private Double gpsy; // 随便造的一个属性
   private Integer uid;
 
+
+  private Integer id; // 订单id，主键
+  private String code; // 订单编号
+  private Double total; // 订单总金额
+
+  // 订单和用户是多对一的关系，即一个订单只属于一个用户
   private User user;
 
-  public Integer getUid() {
-    return uid;
-  }
-
-  public void setUid(Integer uid) {
-    this.uid = uid;
-  }
-
-  public Integer getId() {
-    return id;
-  }
-
-  public void setId(Integer id) {
-    this.id = id;
-  }
-
-  public Double getPrice() {
-    return price;
-  }
-
-  public void setPrice(Double price) {
-    this.price = price;
-  }
-
-  public Double getGpsy() {
-    return gpsy;
-  }
-
-  public void setGpsy(Double gpsy) {
-    this.gpsy = gpsy;
-  }
-
-  public User getUser() {
-    return user;
-  }
-
-  public void setUser(User user) {
-    this.user = user;
-  }
-
-  @Override
-  public String toString() {
-    return "Order{" +
-      "id=" + id +
-      ", price=" + price +
-      ", gpsy=" + gpsy +
-      ", user=" + user +
-      '}';
-  }
+  // 订单和商品是多对多的关系，即一个订单可以包含多种商品
+  private List<Article> articles;
 }

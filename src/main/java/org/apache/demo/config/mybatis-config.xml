@@ -25,7 +25,7 @@
 
 
   <settings>
-    <!-- 全局地开启或关闭配置文件中的所有映射器已经配置的任何缓存（二级缓存）。
+    <!-- 二级缓存开关，全局地开启或关闭配置文件中的所有映射器已经配置的任何缓存（二级缓存）。
       与mapper.xml文件中的<cache></cache>标签，共同决定“二级缓存”的启用与停止
      -->
     <setting name="cacheEnabled" value="true"/>
@@ -81,11 +81,11 @@
     <!-- 为当前实体类起别名，别名为 User，
         最佳实践：别名为当前实体类的类名（不包含包名），不要将类名起为小写（user）。
      -->
-    <typeAlias type="org.apache.demo.entity.User" alias="User"/>
-    <typeAlias type="org.apache.demo.entity.Order" alias="Order"/>
+<!--    <typeAlias type="org.apache.demo.entity.User" alias="User"/>-->
+<!--    <typeAlias type="org.apache.demo.entity.Order" alias="Order"/>-->
 
     <!-- 也可以配置包名，该包下的所有实体类都会起个别名，别名就是当前类类名（不包含包名） -->
-<!--    <package name="org.apache.demo.entity"/>-->
+    <package name="org.apache.demo.entity"/>
   </typeAliases>
 
   <!--<typeHandlers></typeHandlers>-->
@@ -135,6 +135,9 @@
 　　     （3）如果databaseId不为null，他只会找到配置databaseId的sql语句
 　　     （4）MyBatis 会加载不带 databaseId 属性和带有匹配当前数据库databaseId 属性的所有语句。如果同时找到带有 databaseId 和不带databaseId 的相同语句，则后者会被舍弃。
   -->
+  <!-- databaseIdProvider 还可以自定义实现，只需要实现 DatabaseIdProvider 即可，如果使用自定义的 DatabaseIdProvider，
+       只需要像下面这样配置即可（如需属性，配置属性即可）：
+          <databaseIdProvider type="com.daily.demo.MyDatabaseIdProvider" /> -->
   <databaseIdProvider type="DB_VENDOR">
     <property name="Oracle" value="oracle"/>
     <property name="MySQL" value="mysql"/>

@@ -21,5 +21,6 @@ import java.util.List;
 
 public interface OrderMapper {
 
-  public List<Order> findOrders();
+  Order selectOrderById(int id);
+  List<Order> findOrders();
 }

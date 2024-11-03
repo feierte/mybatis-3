@@ -17,108 +17,174 @@
 
 -->
 <!DOCTYPE mapper
-  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.apache.demo.mapper.UserMapper">
 
-  <!-- 其他命名空间缓存配置的引用 -->
-  <!--<cache-ref namespace=""/>-->
-  <cache></cache>
+    <!-- 其他命名空间缓存配置的引用 -->
+    <!--<cache-ref namespace=""/>-->
+<!--    <cache></cache>-->
 
-  <!--
-    useCache属性：用来本条sql设置是否禁用二级缓存的。设置useCache为false可以禁用当前select语句的二级缓存，
-      即每次查询都会发出sql去查询数据库，默认值是true，即当前select语句使用二级缓存。
-    flushCache属性：默认情况下为true，表示针对该语句的每次执行都会刷新缓存。（该sql语句的每次执行都会清空缓存）
-     -->
-  <select id="selectUserByCondition" parameterType="user" resultMap="userResultMap"
-          useCache="true">
-    select * from `user`
-    <where>
-      <if test="id != null">
-        and user_id = #{id}
-      </if>
-      <if test="username != null">
-        and user_name = #{username}
-      </if>
-    </where>
-  </select>
-
-  <!-- 开启并配置该命名空间的二级缓存，应用级缓存，生命周期是整个应用，可以跨线程使用：
-  当开启了二级缓存
-    1、映射语句文件中的所有 select 语句将会被缓存。
-    2、映射语句文件中的所有 insert,update 和 delete 语句会刷新缓存。
-    3、缓存会使用 Least Recently Used(LRU,最近最少使用的)算法来收回。
-    4、根据时间表(比如 no Flush Interval,没有刷新间隔), 缓存不会以任何时间顺序 来刷新。
-    5、缓存会存储列表集合或对象(无论查询方法返回什么)的 1024 个引用。
-    6、缓存会被视为是 read/write(可读/可写)的缓存,意味着对象检索不是共享的,而 且可以安全地被调用者修改,而不干扰其他调用者或线程所做的潜在修改。
-   -->
-  <!--<cache></cache>-->
-
-  <!--
-    statementType （可选配置，默认配置为PREPARED）值为STATEMENT，PREPARED 或 CALLABLE 的一个。
-    这会让 MyBatis 分别使用 Statement，PreparedStatement 或 CallableStatement，默认值：PREPARED。
-   -->
-  <select id="selectUser" resultType="User" statementType="PREPARED">
-    SELECT id AS "id", username AS "username"
-    FROM `user`
-    WHERE id= #{id}
-  </select>
-
-  <select id="selectUserByConstructor" resultMap="userResultMap">
-    SELECT *
-    FROM `user`
-    WHERE user_id = #{id}
-  </select>
-
-
-  <resultMap id="userResultMap" type="User">
-    <!-- constructor：用于在实例化类时，注入结果到构造方法中 -->
-    <constructor>
-      <!-- idArg：id参数，标记出作为id的结果可以帮助提高整体性能 -->
-      <!--<idArg name="id" column="user_id" javaType="int"/>-->
-      <!-- arg：将被注入到构造方法的一个普通结果
-          column：数据库中的列名，或者是列的别名。一般情况下，这和传递给 resultSet.getString(columnName) 方法的参数一样。
-          name：构造方法形参的名字。从 3.4.3 版本开始，通过指定具体的参数名，你可以以任意顺序写入 arg 元素。
+    <!--
+      useCache属性：用来本条sql设置是否禁用二级缓存的。设置useCache为false可以禁用当前select语句的二级缓存，
+        即每次查询都会发出sql去查询数据库，默认值是true，即当前select语句使用二级缓存。
+      flushCache属性：默认情况下为true，表示针对该语句的每次执行都会刷新缓存。（该sql语句的每次执行都会清空缓存）
        -->
-      <arg column="user_id" javaType="Integer"/>
-      <arg column="user_name" javaType="String"/>
-      <arg column="user_password" javaType="String"/>
-    </constructor>
-  </resultMap>
+    <select id="selectUserByCondition" parameterType="user" resultMap="userResultMap"
+            useCache="true">
+        select * from `user`
+        <where>
+            <if test="id != null">
+                and user_id = #{id}
+            </if>
+            <if test="username != null">
+                and user_name = #{username}
+            </if>
+        </where>
+    </select>
 
-  <!--<select id="selectPerson"
-          parameterType="int"
-          parameterMap="deprecated"
-          resultType="hashmap"
-          resultMap="personResultMap"
-          flushCache="false"
-          useCache="true"
-          timeout="10"
-          fetchSize="256"
-          statementType="PREPARED"
-          resultSetType="FORWARD_ONLY">
-      SELECT * FROM `user` WHERE user_id = #{id}
-  </select>-->
+    <!-- 开启并配置该命名空间的二级缓存，应用级缓存，生命周期是整个应用，可以跨线程使用：
+    当开启了二级缓存
+      1、映射语句文件中的所有 select 语句将会被缓存。
+      2、映射语句文件中的所有 insert,update 和 delete 语句会刷新缓存。
+      3、缓存会使用 Least Recently Used(LRU,最近最少使用的)算法来收回。
+      4、根据时间表(比如 no Flush Interval,没有刷新间隔), 缓存不会以任何时间顺序 来刷新。
+      5、缓存会存储列表集合或对象(无论查询方法返回什么)的 1024 个引用。
+      6、缓存会被视为是 read/write(可读/可写)的缓存,意味着对象检索不是共享的,而 且可以安全地被调用者修改,而不干扰其他调用者或线程所做的潜在修改。
+     -->
+    <!--<cache></cache>-->
+
+    <!--
+      statementType （可选配置，默认配置为PREPARED）值为STATEMENT，PREPARED 或 CALLABLE 的一个。
+      这会让 MyBatis 分别使用 Statement，PreparedStatement 或 CallableStatement，默认值：PREPARED。
+     -->
+    <select id="selectUser" resultType="User" statementType="PREPARED">
+        SELECT id AS "id", user_name AS "username"
+        FROM tb_user
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectUserByConstructor" resultMap="userResultMap">
+        SELECT *
+        FROM tb_user
+        WHERE user_id = #{id}
+    </select>
 
 
-  <!-- 延迟加载示例 -->
-  <select id="findById" resultMap="deferResultMap">
-    select * from `user` where user_id = #{id}
-  </select>
+    <!-- 结果映射，将查询结果映射到Java对象中
+        id：当前命名空间中的一个唯一标识，用于标识一个结果映射。
+        type：类的完全限定名或者一个类型别名。
+        autoMapping：如果设置这个属性，MyBatis将会为本结果映射开启或者关闭自动映射。
+          这个属性会覆盖全局的属性 autoMappingBehavior。默认值：未设置（unset）。
+     -->
+    <resultMap id="userResultMap" type="User" autoMapping="false">
+        <!-- constructor：用于在实例化类时，注入结果到构造方法中 -->
+        <constructor>
+            <!-- idArg：id参数，标记出作为id的结果可以帮助提高整体性能 -->
+            <!--<idArg name="id" column="user_id" javaType="int"/>-->
+            <!-- arg：将被注入到构造方法的一个普通结果
+                column：数据库中的列名，或者是列的别名。一般情况下，这和传递给 resultSet.getString(columnName) 方法的参数一样。
+                name：构造方法形参的名字。从 3.4.3 版本开始，通过指定具体的参数名，你可以以任意顺序写入 arg 元素。
+             -->
+            <arg column="user_id" javaType="Integer"/>
+            <arg column="user_name" javaType="String"/>
+            <arg column="user_password" javaType="String"/>
+        </constructor>
 
-  <resultMap id="deferResultMap" type="User">
-    <id property="id" column="user_id"></id>
-    <result property="username" column="user_name"></result>
+        <!-- id 和 result 元素都将一个列的值映射到一个简单数据类型（String, int, double, Date 等）的属性或字段。
+            这两者之间的唯一不同是，id 元素表示的结果将是对象的标识属性，这会在比较对象实例时用到。
+            这样可以提高整体的性能，尤其是进行缓存和嵌套结果映射（也就是连接映射）的时候。 -->
+        <!--    <id column="user_id" property="id"/>-->
+        <!-- 注入到字段或 JavaBean 属性的普通结果
+            常见属性：
+              column：数据库中的列名，或者是列的别名。一般情况下，这和传递给 resultSet.getString(columnName) 方法的参数一样。
+              jdbcType：JDBC 类型，只需要在可能执行插入、更新和删除的且允许空值的列上指定 JDBC 类型。
+                  这是 JDBC 的要求而非 MyBatis 的要求。如果你直接面向 JDBC 编程，你需要对可能存在空值的列指定这个类型。
+              property：Java 对象中属性（成员变量）。
+              javaType：一个 Java 类的完全限定名，或一个类型别名（关于内置的类型别名，可以参考上面的表格）。
+                  如果你映射到一个 JavaBean，MyBatis 通常可以推断类型。然而，如果你映射到的是 HashMap，那么你应该明确地指定 javaType 来保证行为与期望的相一致。
+              typeHandler：使用这个属性，你可以覆盖默认的类型处理器。 这个属性值是一个类型处理器实现类的完全限定名，或者是类型别名。
+        -->
+        <!--    <result column="user_name" jdbcType="xxx" property="userName" typeHandler="xxx" />-->
 
-    <!-- 一对多关联查询 -->
-    <!-- select和column用于实现延迟加载 -->
-    <collection property="orders" ofType="org.apache.demo.entity.Order"
-                select="org.apache.demo.mapper.OrderMapper.findOrderByUid" column="user_id"
-                fetchType="lazy"> <!-- 通过 fetchType属性实现局部加载
+        <!-- 一个复杂类型的关联；许多结果将包装成这种类型
+            常用于一对一嵌套映射中
+        -->
+        <!--    <association property="xxx" javaType="xx" resultMap="xx"/>-->
+
+        <!-- 一个复杂类型的集合，常用于一对多嵌套映射中 -->
+        <!--    <collection property="xxx" javaType="xxx" resultMap="xxx"/>-->
+
+        <!-- 使用结果值来决定使用哪个 resultMap -->
+<!--        <discriminator javaType="">-->
+<!--            <case value=""></case>-->
+<!--        </discriminator>-->
+    </resultMap>
+
+    <!--<select id="selectPerson"
+            parameterType="int"
+            parameterMap="deprecated"
+            resultType="hashmap"
+            resultMap="personResultMap"
+            flushCache="false"
+            useCache="true"
+            timeout="10"
+            fetchSize="256"
+            statementType="PREPARED"
+            resultSetType="FORWARD_ONLY">
+        SELECT * FROM `user` WHERE user_id = #{id}
+    </select>-->
+
+
+    <!-- 延迟加载示例 -->
+    <select id="findById" resultMap="deferResultMap">
+        select *
+        from tb_user
+        where user_id = #{id}
+    </select>
+
+    <resultMap id="deferResultMap" type="User">
+        <id property="id" column="user_id"></id>
+        <result property="username" column="user_name"></result>
+
+        <!-- 一对多关联查询 -->
+        <!-- select和column用于实现延迟加载
+            ofType：这个属性非常重要，它用来将 JavaBean（或字段）属性的类型和集合存储的类型区分开来。
+              就是 property 指定的 java 属性中存储元素的类型，该属性一般是个集合类型（因为 collection 标签）
+            jdbcType：指定 property 属性对应的 java 类型
+        -->
+        <collection property="orders" javaType="ArrayList" ofType="org.apache.demo.entity.Order"
+                    select="org.apache.demo.mapper.OrderMapper.findOrderByUid" column="user_id"
+                    fetchType="lazy"> <!-- 通过 fetchType属性实现局部加载
                                     fetchType属性：表示加载策略，lazy：延迟加载，eager：立即加载 -->
-      <id property="id" column="id"></id>
-      <result property="price" column="price"></result>
-      <result property="gpsy" column="gpsy"></result>
-    </collection>
-  </resultMap>
+            <id property="id" column="id"></id>
+            <result property="price" column="price"></result>
+            <result property="gpsy" column="gpsy"></result>
+        </collection>
+    </resultMap>
+
+    <resultMap id="userResultMap1" type="User">
+        <id property="id" column="id"/>
+        <result property="userName" column="user_name"/>
+        <result property="loginName" column="login_name"/>
+        <result property="password" column="password"/>
+        <result property="phone" column="phone"/>
+        <result property="address" column="address"/>
+        <!-- 一对多关联映射:collection -->
+        <collection property="orders" javaType="ArrayList"
+                    column="id" ofType="Order"
+                    select="org.apache.demo.mapper.OrderMapper.selectOrderByUserId"
+                    fetchType="lazy">
+            <id property="id" column="id"/>
+            <result property="code" column="code"/>
+            <result property="total" column="total"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectUserById" parameterType="int"
+            resultMap="userResultMap1">
+        SELECT *
+        FROM tb_user
+        WHERE id = #{id}
+    </select>
 </mapper>
