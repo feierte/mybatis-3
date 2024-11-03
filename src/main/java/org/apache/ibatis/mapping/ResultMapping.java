@@ -27,14 +27,19 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
 
 /**
  * @author Clinton Begin
+ *
+ * @apiNote 对应 <resultMap/> 标签中的一个 <result/>、<id/>、<constructor/> 等标签
  */
 public class ResultMapping {
 
   private Configuration configuration;
   private String property;
   private String column;
+  // 属性的 Java 类型
   private Class<?> javaType;
+  // 字段的数据库类型
   private JdbcType jdbcType;
+  // 类型转换器，将 Java 属性转换为数据库字段，或者将数据库字段转换为 Java 属性
   private TypeHandler<?> typeHandler;
   private String nestedResultMapId;
   private String nestedQueryId;
@@ -44,6 +49,7 @@ public class ResultMapping {
   private List<ResultMapping> composites;
   private String resultSet;
   private String foreignColumn;
+  // 是否延迟加载
   private boolean lazy;
 
   ResultMapping() {

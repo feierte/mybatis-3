@@ -16,16 +16,17 @@
        limitations under the License.
 
 -->
-<configuration>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.apache.demo.mapper.TimeMapper">
 
-  <dataSource>
-    <property name="driverClass" value="com.mysql.cj.jdbc.Driver"></property>
-    <property name="jdbcUrl" value="jdbc:mysql://47.102.156.134:3306/cms?characterEncoding=utf-8"></property>
-    <property name="username" value="root"></property>
-    <property name="password" value="123456"></property>
-  </dataSource>
+    <select id="getTime" resultType="string" databaseId="mysql">
+        select now() from dual
+    </select>
 
-  <!-- 存放mapper.xml的全路径 -->
-  <mapper resource="src/main/resources/UserMapper.xml"></mapper>
+    <select id="getTime" resultType="string" databaseId="oracle">
+        select 'oralce'||to_char(sysdate,'yyyy-mm-dd hh24:mi:ss') from dual
+    </select>
 
-</configuration>
+</mapper>

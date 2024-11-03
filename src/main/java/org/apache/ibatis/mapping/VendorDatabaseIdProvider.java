@@ -76,6 +76,7 @@ public class VendorDatabaseIdProvider implements DatabaseIdProvider {
   private String getDatabaseProductName(DataSource dataSource) throws SQLException {
     try (Connection con = dataSource.getConnection()) {
       DatabaseMetaData metaData = con.getMetaData();
+      // 通过不同数据库厂商提供的 jdbc 驱动实现来返回数据库产品名称，mybatis 就是用这个来进行不同类型数据库判断的
       return metaData.getDatabaseProductName();
     }
 

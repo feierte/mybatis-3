@@ -45,9 +45,15 @@ public class ResultMap {
   private List<ResultMapping> propertyResultMappings;
   private Set<String> mappedColumns;
   private Set<String> mappedProperties;
+  // 鉴别器（对查询的结果进行类似 Switch 的分支处理）
   private Discriminator discriminator;
+  // 是否有嵌套结果集
   private boolean hasNestedResultMaps;
+  // 是否有嵌套查询
   private boolean hasNestedQueries;
+  // 是否自动映射。
+  // 什么是自动映射？映射就是将Java对象中属性映射到数据库字段，或者数据库字段映射到Java对象属性。
+  // 自动映射就是不需要类型转换器（TypeHandler）介入，Java对象属性和数据库字段能够自动映射。
   private Boolean autoMapping;
 
   private ResultMap() {

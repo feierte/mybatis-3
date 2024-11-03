@@ -1,4 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+<!--
+
+       Copyright 2009-2024 the original author or authors.
+
+       Licensed under the Apache License, Version 2.0 (the "License");
+       you may not use this file except in compliance with the License.
+       You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+       Unless required by applicable law or agreed to in writing, software
+       distributed under the License is distributed on an "AS IS" BASIS,
+       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+       See the License for the specific language governing permissions and
+       limitations under the License.
+
+-->
 <!DOCTYPE configuration
   PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-config.dtd">
@@ -20,7 +37,12 @@
     <setting name="useColumnLabel" value="true"/>
     <!-- 允许 JDBC 支持自动生成主键，需要驱动兼容。 如果设置为 true 则这个设置强制使用自动生成主键，尽管一些驱动不能兼容但仍可正常工作（比如 Derby）。 -->
     <setting name="useGeneratedKeys" value="false"/>
-    <!-- 指定 MyBatis 应如何自动映射列到字段或属性。 NONE 表示取消自动映射；PARTIAL 只会自动映射没有定义嵌套结果集映射的结果集。 FULL 会自动映射任意复杂的结果集（无论是否嵌套） -->
+    <!-- 指定 MyBatis 应如何自动映射列到字段或属性。
+          NONE 表示取消自动映射；
+          PARTIAL 只会自动映射没有定义嵌套结果集映射的结果集。
+          FULL 会自动映射任意复杂的结果集（无论是否嵌套）
+        不建议使用FULL等级的映射，比如：A表嵌套B表，两个有一个字段名称一样MyBatis默认会用A表的值。
+    -->
     <setting name="autoMappingBehavior" value="PARTIAL"/>
     <!-- @指定发现自动映射目标未知列（或者未知属性类型）的行为。
     NONE: 不做任何反应
@@ -56,7 +78,14 @@
   </settings>
 
   <typeAliases>
+    <!-- 为当前实体类起别名，别名为 User，
+        最佳实践：别名为当前实体类的类名（不包含包名），不要将类名起为小写（user）。
+     -->
     <typeAlias type="org.apache.demo.entity.User" alias="User"/>
+    <typeAlias type="org.apache.demo.entity.Order" alias="Order"/>
+
+    <!-- 也可以配置包名，该包下的所有实体类都会起个别名，别名就是当前类类名（不包含包名） -->
+<!--    <package name="org.apache.demo.entity"/>-->
   </typeAliases>
 
   <!--<typeHandlers></typeHandlers>-->
@@ -94,8 +123,23 @@
     </environment>
   </environments>
 
-  <!--  数据库厂商标识: 为了解决数据库厂商不同的而造成的语句不能执行问题 -->
-  <!--<databaseIdProvider type=""></databaseIdProvider>-->
+  <!--  数据库厂商标识: 为了解决数据库厂商不同的而造成的语句不能执行问题
+        （1）databaseIdProvider 的 type 属性是必须的，不配置时会报错。DB_VENDOR 这个属性值使用的是 VendorDatabaseIdProvider 类的别名。
+        （2）property 子元素是配置一个数据库，其中的 name 属性是数据库名称，value 是我们自定义的别名，通过别名我们可以在 SQL 语句中标识适用于哪种数据库运行。
+            <select id="xxx" databaseId="mysql" >
+                ......
+            </select>
+        databaseId 匹配规则如下：
+        （1）如果没有配置databaseIdProvider标签，那么databaseId=null
+　　     （2）如果配置了databaseIdProvider标签，使用标签配置的name去匹配数据库信息，匹配上设置databaseId=配置指定的值，否则依旧为null
+　　     （3）如果databaseId不为null，他只会找到配置databaseId的sql语句
+　　     （4）MyBatis 会加载不带 databaseId 属性和带有匹配当前数据库databaseId 属性的所有语句。如果同时找到带有 databaseId 和不带databaseId 的相同语句，则后者会被舍弃。
+  -->
+  <databaseIdProvider type="DB_VENDOR">
+    <property name="Oracle" value="oracle"/>
+    <property name="MySQL" value="mysql"/>
+    <property name="Postgresql" value="pg"/>
+  </databaseIdProvider>
 
   <mappers>
     <!-- 使用相对于类路径的资源引用 -->
@@ -105,7 +149,7 @@
     <!-- 使用映射器接口实现类的完全限定类名 -->
     <!--<mapper class="org.mybatis.builder.AuthorMapper"/>-->
 
-    <!-- 将包内的映射器接口实现全部注册为映射器 Mapper接口类必须和Mapperxml文件 名称相同且在相同的包下 -->
+    <!-- 将包内的映射器接口实现全部注册为映射器 Mapper接口类必须和Mapper xml文件 名称相同且在相同的包下 -->
     <package name="org.apache.demo.mapper"/>
   </mappers>
 </configuration>
