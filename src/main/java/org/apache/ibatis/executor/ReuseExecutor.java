@@ -35,6 +35,8 @@ import org.apache.ibatis.transaction.Transaction;
 
 /**
  * @author Clinton Begin
+ *
+ * @apiNote 复用 Statement
  */
 public class ReuseExecutor extends BaseExecutor {
 

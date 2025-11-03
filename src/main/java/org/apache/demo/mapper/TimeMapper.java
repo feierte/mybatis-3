@@ -13,27 +13,21 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.apache.ibatis.executor.resultset;
-
-import java.sql.CallableStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
-
-import org.apache.ibatis.cursor.Cursor;
+package org.apache.demo.mapper;
 
 /**
- * @author Clinton Begin
+ * @author Jie Zhao
+ * @date 2024/11/3 10:16
  */
-public interface ResultSetHandler {
+public interface TimeMapper {
 
-  // 处理结果集，生成相应的结果对象集合
-  <E> List<E> handleResultSets(Statement stmt) throws SQLException;
-
-  // 处理结果集，返回游标对象
-  <E> Cursor<E> handleCursorResultSets(Statement stmt) throws SQLException;
-
-  // 处理储存过程的输出参数
-  void handleOutputParameters(CallableStatement cs) throws SQLException;
-
+  /**
+   * 用于演示 mapper 中的 databaseId 属性。
+   *
+   * <p/>
+   * 获取当前数据库的当前时间，如果是 mysql 数据库，获取的就是 mysql 数据库当前时间，
+   * 如果是 postgresql 数据库，获取的就是 postgresql 数据库当前时间。
+   * @return 当前时间的字符串表示形式
+   */
+  String getTime();
 }

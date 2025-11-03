@@ -1,5 +1,5 @@
 /**
- *    Copyright 2009-2019 the original author or authors.
+ *    Copyright 2009-2024 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -76,6 +76,7 @@ public class VendorDatabaseIdProvider implements DatabaseIdProvider {
   private String getDatabaseProductName(DataSource dataSource) throws SQLException {
     try (Connection con = dataSource.getConnection()) {
       DatabaseMetaData metaData = con.getMetaData();
+      // 通过不同数据库厂商提供的 jdbc 驱动实现来返回数据库产品名称，mybatis 就是用这个来进行不同类型数据库判断的
       return metaData.getDatabaseProductName();
     }
 
