@@ -1,24 +1,5 @@
-/**
- *    Copyright 2009-2025 the original author or authors.
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
-package org.apache.demo;
+package com.example;
 
-import org.apache.demo.entity.Order;
-import org.apache.demo.entity.User;
-import org.apache.demo.mapper.OrderMapper;
-import org.apache.demo.mapper.UserMapper;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -26,7 +7,6 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 /**
  * @author jie zhao
@@ -35,7 +15,7 @@ import java.util.List;
 public class MybatisTest {
 
   // org/sperri/mybatis/java/config/mybatis-config.xml
-  private static final String RESOURCE = "org/apache/demo/config/mybatis-config.xml";
+  private static final String RESOURCE = "com/example/config/mybatis-config.xml";
 
   /**
    * SqlSessionFactory 一旦被创建就应该在应用的运行期间一直存在，没有任何理由丢弃它或重新创建另一个实例。
@@ -74,22 +54,22 @@ public class MybatisTest {
       List<Order> orders = orderMapper.findOrders();
       System.out.println(orders);*/
 
-      User u = sqlSession.selectOne("org.apache.demo.mapper.UserMapper.selectUser", 1);
-      System.out.println(u);
+//      User u = sqlSession.selectOne("org.apache.demo.mapper.UserMapper.selectUser", 1);
+//      System.out.println(u);
       /*
        * 映射器是一些绑定映射语句的接口。映射器接口的实例是从 SqlSession 中获得的。
        * 虽然从技术层面上来讲，任何映射器实例的最大作用域与请求它们的 SqlSession 相同。
        * 但方法作用域才是映射器实例的最合适的作用域。 也就是说，映射器实例应该在调用它们的方法中被获取，
        * 使用完毕之后即可丢弃。
        */
-      UserMapper mapper = sqlSession.getMapper(UserMapper.class);
-
-      User parameter = new User(1, "张三", "");
-      User user1 = mapper.selectUserByCondition(parameter);
-      System.out.println(user1);
-
-      User user = mapper.selectUser(1);
-      System.out.println(user);
+//      UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+//
+//      User parameter = new User(1, "张三", "");
+//      User user1 = mapper.selectUserByCondition(parameter);
+//      System.out.println(user1);
+//
+//      User user = mapper.selectUser(1);
+//      System.out.println(user);
 
             /*User user1 = mapper.selectUserByConstructor(1);
             System.out.println(user1);*/

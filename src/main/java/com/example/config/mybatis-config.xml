@@ -83,7 +83,7 @@
 
   <plugins>
       <!-- 注册拦截器，一个plugin表示一个拦截器 -->
-      <plugin interceptor="org.apache.demo.plugin.MyPlugin">
+      <plugin interceptor="com.example.plugin.MyPlugin">
           <!--<property name="databaseType" value="mysql"/>-->
       </plugin>
   </plugins>

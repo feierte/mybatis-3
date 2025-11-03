@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.apache.demo.plugin;
+package com.example.plugin;
 
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.plugin.*;
@@ -33,7 +33,7 @@ import java.sql.Connection;
 public class MyPlugin implements Interceptor {
 
   /**
-   * 这是是每次执行操作的时候，都会进入这个拦截器的方法内
+   * 这是每次执行操作的时候，都会进入这个拦截器的方法内
    * @param invocation
    * @return
    * @throws Throwable
