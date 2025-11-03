@@ -13,20 +13,33 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.apache.demo.mapper;
+package com.example.mapper;
 
-import org.apache.demo.entity.User;
+import com.example.model.User;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
 /**
- * @author jie zhao
- * @date 2020/4/9 19:53
+ * @author Jie Zhao
+ * @date 2025/11/3 21:27
  */
+// @Mapper 注解在Spring环境中常用，纯MyBatis环境可以不用
 public interface UserMapper {
 
-    User selectUser(Integer id);
-    User selectUserByConstructor(Integer id);
+  @Insert("INSERT INTO users(name, email) VALUES(#{name}, #{email})")
+  @Options(useGeneratedKeys = true, keyProperty = "id")
+  int insert(User user);
 
-    User selectUserByCondition(User user);
+  @Select("SELECT * FROM users WHERE id = #{id}")
+  User findById(Integer id);
+
+  @Select("SELECT * FROM users")
+  List<User> findAll();
+
+  @Update("UPDATE users SET name = #{name}, email = #{email} WHERE id = #{id}")
+  int update(User user);
+
+  @Delete("DELETE FROM users WHERE id = #{id}")
+  int deleteById(Integer id);
 }

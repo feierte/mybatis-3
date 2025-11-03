@@ -13,25 +13,26 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.apache.demo.entity;
+package com.example.model;
 
-public class Order {
-
+/**
+ * @author Jie Zhao
+ * @date 2025/11/3 21:28
+ */
+public class User {
   private Integer id;
-  private Double price;
-  private Double gpsy; // 随便造的一个属性
-  private Integer uid;
+  private String name;
+  private String email;
 
-  private User user;
+  // 构造函数
+  public User() {}
 
-  public Integer getUid() {
-    return uid;
+  public User(String name, String email) {
+    this.name = name;
+    this.email = email;
   }
 
-  public void setUid(Integer uid) {
-    this.uid = uid;
-  }
-
+  // Getter 和 Setter 方法
   public Integer getId() {
     return id;
   }
@@ -40,37 +41,28 @@ public class Order {
     this.id = id;
   }
 
-  public Double getPrice() {
-    return price;
+  public String getName() {
+    return name;
   }
 
-  public void setPrice(Double price) {
-    this.price = price;
+  public void setName(String name) {
+    this.name = name;
   }
 
-  public Double getGpsy() {
-    return gpsy;
+  public String getEmail() {
+    return email;
   }
 
-  public void setGpsy(Double gpsy) {
-    this.gpsy = gpsy;
-  }
-
-  public User getUser() {
-    return user;
-  }
-
-  public void setUser(User user) {
-    this.user = user;
+  public void setEmail(String email) {
+    this.email = email;
   }
 
   @Override
   public String toString() {
-    return "Order{" +
+    return "User{" +
       "id=" + id +
-      ", price=" + price +
-      ", gpsy=" + gpsy +
-      ", user=" + user +
+      ", name='" + name + '\'' +
+      ", email='" + email + '\'' +
       '}';
   }
 }
