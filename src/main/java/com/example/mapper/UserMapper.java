@@ -26,20 +26,13 @@ import java.util.List;
  */
 // @Mapper 注解在Spring环境中常用，纯MyBatis环境可以不用
 public interface UserMapper {
+  /**
+   * 查询所有活跃用户及其角色和权限（三层嵌套）
+   */
+  List<User> findAllActiveUsersWithRolesAndPermissions();
 
-  @Insert("INSERT INTO users(name, email) VALUES(#{name}, #{email})")
-  @Options(useGeneratedKeys = true, keyProperty = "id")
-  int insert(User user);
-
-  @Select("SELECT * FROM users WHERE id = #{id}")
-  User findById(Integer id);
-
-  @Select("SELECT * FROM users")
-  List<User> findAll();
-
-  @Update("UPDATE users SET name = #{name}, email = #{email} WHERE id = #{id}")
-  int update(User user);
-
-  @Delete("DELETE FROM users WHERE id = #{id}")
-  int deleteById(Integer id);
+  /**
+   * 根据用户ID查询用户及其角色和权限
+   */
+  User findUserWithRolesAndPermissionsById(Long userId);
 }

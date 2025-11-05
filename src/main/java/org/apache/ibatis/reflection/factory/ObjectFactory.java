@@ -43,7 +43,7 @@ import java.util.Properties;
  *   }}
  * }
  * </pre>
- * <!-- mybatis-config.xml -->
+ * <!-- mybatis-config-example.xml -->
  *  <objectFactory type="org.mybatis.example.ExampleObjectFactory">
  *    <property name="someProperty" value="100"/>
  *  </objectFactory>

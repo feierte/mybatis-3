@@ -73,7 +73,7 @@
   </settings>
 
   <typeAliases>
-    <typeAlias type="org.apache.demo.entity.User" alias="User"/>
+    <typeAlias type="com.example.model.User" alias="User"/>
   </typeAliases>
 
   <!--<typeHandlers></typeHandlers>-->
@@ -101,7 +101,7 @@
          也就是说它自身并不实现任何事务功能，而是托管出去由其他框架来实现。托管的意义显而易见，正是为整合而设。
          所以有关JDBC事务模块的内容明显不再是MyBatis功能中的重点，也许只有在单独使用MyBatis的少量系统中才会使用到。
       -->
-      <transactionManager type="JDBC"></transactionManager>
+      <transactionManager type="JDBC"/>
       <dataSource type="POOLED">
         <property name="driver" value="${jdbc.driver}"/>
         <property name="url" value="${jdbc.url}"/>

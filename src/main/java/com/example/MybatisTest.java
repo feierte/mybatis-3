@@ -14,8 +14,8 @@ import java.io.InputStream;
  */
 public class MybatisTest {
 
-  // org/sperri/mybatis/java/config/mybatis-config.xml
-  private static final String RESOURCE = "com/example/config/mybatis-config.xml";
+  // org/sperri/mybatis/java/config/mybatis-config-example.xml
+  private static final String RESOURCE = "com/example/config/mybatis-config-example.xml";
 
   /**
    * SqlSessionFactory 一旦被创建就应该在应用的运行期间一直存在，没有任何理由丢弃它或重新创建另一个实例。

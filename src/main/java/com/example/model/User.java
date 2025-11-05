@@ -15,54 +15,30 @@
  */
 package com.example.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
 /**
  * @author Jie Zhao
  * @date 2025/11/3 21:28
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 public class User {
-  private Integer id;
-  private String name;
+  private Long id;
+  private String username;
   private String email;
-
-  // 构造函数
-  public User() {}
-
-  public User(String name, String email) {
-    this.name = name;
-    this.email = email;
-  }
-
-  // Getter 和 Setter 方法
-  public Integer getId() {
-    return id;
-  }
-
-  public void setId(Integer id) {
-    this.id = id;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public String getEmail() {
-    return email;
-  }
-
-  public void setEmail(String email) {
-    this.email = email;
-  }
-
-  @Override
-  public String toString() {
-    return "User{" +
-      "id=" + id +
-      ", name='" + name + '\'' +
-      ", email='" + email + '\'' +
-      '}';
-  }
+  private String fullName;
+  private String department;
+  private String position;
+  private Byte status;
+  private LocalDateTime createdAt;
+  private List<Role> roles; // 用户拥有的角色
 }
