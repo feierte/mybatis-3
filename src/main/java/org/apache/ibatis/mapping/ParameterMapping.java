@@ -24,6 +24,12 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
 
 /**
  * @author Clinton Begin
+ * @apiNote 每个 #{property, jdbcType=VARCHAR, javaType=String, typeHandler=...} 对应一个 ParameterMapping 对象。
+ *  1.property：参数属性路径，如 "id"、"user.name"、"list[0].age"
+ *  2.javaType：Java 类型（可自动推断）
+ *  3.jdbcType：JDBC 类型（如 VARCHAR, INTEGER），对 null 值尤其重要
+ *  4.typeHandler：类型处理器，负责 Java ↔ JDBC 转换
+ *  5.mode：IN / OUT / INOUT（主要用于存储过程）
  */
 public class ParameterMapping {
 

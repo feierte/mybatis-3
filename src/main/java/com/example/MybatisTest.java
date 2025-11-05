@@ -1,5 +1,7 @@
 package com.example;
 
+import com.example.mapper.UserMapper;
+import com.example.model.User;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -7,6 +9,7 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * @author jie zhao
@@ -14,8 +17,7 @@ import java.io.InputStream;
  */
 public class MybatisTest {
 
-  // org/sperri/mybatis/java/config/mybatis-config-example.xml
-  private static final String RESOURCE = "com/example/config/mybatis-config-example.xml";
+  private static final String RESOURCE = "config/mybatis-config.xml";
 
   /**
    * SqlSessionFactory 一旦被创建就应该在应用的运行期间一直存在，没有任何理由丢弃它或重新创建另一个实例。
@@ -62,17 +64,10 @@ public class MybatisTest {
        * 但方法作用域才是映射器实例的最合适的作用域。 也就是说，映射器实例应该在调用它们的方法中被获取，
        * 使用完毕之后即可丢弃。
        */
-//      UserMapper mapper = sqlSession.getMapper(UserMapper.class);
-//
-//      User parameter = new User(1, "张三", "");
-//      User user1 = mapper.selectUserByCondition(parameter);
-//      System.out.println(user1);
-//
-//      User user = mapper.selectUser(1);
-//      System.out.println(user);
+      UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+      List<User> users = mapper.findAllActiveUsersWithRolesAndPermissions();
+      System.out.println(users);
 
-            /*User user1 = mapper.selectUserByConstructor(1);
-            System.out.println(user1);*/
     }
   }
 }

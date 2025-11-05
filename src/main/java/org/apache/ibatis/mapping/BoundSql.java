@@ -32,12 +32,20 @@ import org.apache.ibatis.session.Configuration;
  * Can also have additional parameters that are created by the dynamic language (for loops, bind...).
  *
  * @author Clinton Begin
+ *
+ * @apiNote BoundSql 包含：
+ *  1.最终 SQL 字符串（已替换 #{} 为 ?）
+ *  2.参数映射信息（ParameterMapping 列表）
+ *  3.参数对象
  */
 public class BoundSql {
 
-  private final String sql; // 进行 #{ } 和 ${ } 替换完毕之后的结果sql, 注意每个 #{ }替换完之后就是一个 ?
-  private final List<ParameterMapping> parameterMappings; // 这里的parameterMappings列表参数里的item个数, 以及每个item的属性名称等等, 都是和上面的sql中的 ? 完全一一对应的.
+  private final String sql; // 进行 #{} 和 ${} 替换完毕之后的结果 sql, 注意每个 #{} 替换完之后就是一个 ?
+  // 每个元素对应一个 ? 的元信息
+  // 这里的 parameterMappings 列表参数里的 item 个数, 以及每个 item 的属性名称等等, 都是和上面的 sql 中的 ? 完全一一对应的.
+  private final List<ParameterMapping> parameterMappings;
   private final Object parameterObject; // 用户传入的数据
+  // 额外参数（如 <bind> 标签生成的）
   private final Map<String, Object> additionalParameters;
   private final MetaObject metaParameters;
 

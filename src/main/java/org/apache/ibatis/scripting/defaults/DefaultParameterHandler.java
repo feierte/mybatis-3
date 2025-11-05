@@ -65,10 +65,13 @@ public class DefaultParameterHandler implements ParameterHandler {
     if (parameterMappings != null) {
       for (int i = 0; i < parameterMappings.size(); i++) {
         ParameterMapping parameterMapping = parameterMappings.get(i);
+        // 忽略 OUT 参数（用于存储过程）
         if (parameterMapping.getMode() != ParameterMode.OUT) {
           Object value;
-          // sql 中 #{}包裹的参数
+          // sql 中 #{} 包裹的参数
           String propertyName = parameterMapping.getProperty();
+
+          // 从 parameterObject 中提取值
           if (boundSql.hasAdditionalParameter(propertyName)) { // issue #448 ask first for additional params
             value = boundSql.getAdditionalParameter(propertyName);  // 参数对应的值
           } else if (parameterObject == null) {
@@ -82,11 +85,12 @@ public class DefaultParameterHandler implements ParameterHandler {
           // 获得 typeHandler、jdbcType属性
           TypeHandler typeHandler = parameterMapping.getTypeHandler();
           JdbcType jdbcType = parameterMapping.getJdbcType();
+          // 处理 null 值的 JdbcType（避免 JDBC 驱动报错）
           if (value == null && jdbcType == null) {
             jdbcType = configuration.getJdbcTypeForNull();
           }
           try {
-            // 设置 ? 占位符的参数
+            // 调用 TypeHandler 设置参数，设置 ? 占位符的参数
             typeHandler.setParameter(ps, i + 1, value, jdbcType);
           } catch (TypeException | SQLException e) {
             throw new TypeException("Could not set parameters for mapping: " + parameterMapping + ". Cause: " + e, e);

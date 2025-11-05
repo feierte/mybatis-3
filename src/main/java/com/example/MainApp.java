@@ -54,51 +54,6 @@ public class MainApp {
       // 3. 获取Mapper接口的代理实现
       UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
 
-      // 4. 执行数据库操作
-
-      // 4.1 先创建表 (H2不会自动建表)
-      createTable(sqlSession);
-
-      // 4.2 插入数据
-      User newUser = new User("张三", "zhangsan@example.com");
-      int result = userMapper.insert(newUser);
-      System.out.println("插入结果: " + result + ", 新ID: " + newUser.getId());
-
-      // 4.3 查询单个用户
-      User foundUser = userMapper.findById(newUser.getId());
-      System.out.println("查询到的用户: " + foundUser);
-
-      // 4.4 插入另一个用户
-      User user2 = new User("李四", "lisi@example.com");
-      userMapper.insert(user2);
-
-      // 4.5 查询所有用户
-      List<User> allUsers = userMapper.findAll();
-      System.out.println("所有用户:");
-      for (User u : allUsers) {
-        System.out.println("  " + u);
-      }
-
-      // 4.6 更新用户
-      foundUser.setName("张三更新");
-      foundUser.setEmail("zhangsan_updated@example.com");
-      int updateResult = userMapper.update(foundUser);
-      System.out.println("更新结果: " + updateResult);
-
-      // 再次查询验证更新
-      User updatedUser = userMapper.findById(foundUser.getId());
-      System.out.println("更新后的用户: " + updatedUser);
-
-      // 4.7 删除用户
-      int deleteResult = userMapper.deleteById(user2.getId());
-      System.out.println("删除结果: " + deleteResult);
-
-      // 4.8 再次查询所有用户，验证删除
-      List<User> remainingUsers = userMapper.findAll();
-      System.out.println("删除后剩余用户:");
-      for (User u : remainingUsers) {
-        System.out.println("  " + u);
-      }
 
       // 提交事务 (因为使用了JDBC事务管理器)
       sqlSession.commit();

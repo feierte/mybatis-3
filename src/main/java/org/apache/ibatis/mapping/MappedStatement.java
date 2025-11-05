@@ -32,13 +32,16 @@ import org.apache.ibatis.session.Configuration;
  * @author Clinton Begin
  *
  * @apiNote
- * 一个 MappedStatement 对象对应一个 mapper.xml 中的一个SQL节点（select、insert、update、delete）
+ * 一个 MappedStatement 对象对应一个 mapper.xml 中的一个SQL节点（select、insert、update、delete）。
+ * MappedStatement 是不可变对象（immutable），一旦构建完成，其内容不可更改。
+ * <p>MappedStatement 实例由 XMLStatementBuilder 或 MapperAnnotationBuilder 在 MyBatis 启动时解析 Mapper XML 或注解时创建，
+ * 并注册到 Configuration.mappedStatements（一个 Map<String, MappedStatement>）中。
  */
 public final class MappedStatement {
 
-  private String resource; // mapper映射文件的路径
+  private String resource; // mapper映射文件的路径，例如：com/example/mapper/UserMapper.xml
   private Configuration configuration;
-  // 节点的id属性加命名空间: namespace.id,如：com.lucky.mybatis.dao.UserMapper.selectByExample
+  // 节点的 id 属性加命名空间: namespace.id，例如：com.lucky.mybatis.dao.UserMapper.selectByExample
   private String id;
   // 尝试影响驱动程序每次批量返回的结果行数和这个设置值相等
   private Integer fetchSize;
@@ -49,31 +52,40 @@ public final class MappedStatement {
   private StatementType statementType;
   // 结果集类型，FORWARD_ONLY / SCROLL_SENSITIVE/SCROLL_INSENSITIVE
   private ResultSetType resultSetType;
-  // 表示解析出来的SQL
+  // 解析后的 SQL 语句（可能包含动态 SQL）
   private SqlSource sqlSource;
   // 二级缓存
-  private Cache cache; // 执行CRUD时，所使用的缓存对象
-  // 请求参数映射，已废弃，目前该属性已经被行内参数映射和parameterType属性所取代
+  private Cache cache; // 执行 CRUD 时，所使用的缓存对象
+  // 请求参数映射，已废弃，目前该属性已经被行内参数映射和 parameterType 属性所取代
   private ParameterMap parameterMap;
-  // 对应Mapper.xml文件中的 resultMap
+  // 结果映射列表（支持多结果集），对应 Mapper.xml 文件中的 resultMap
   private List<ResultMap> resultMaps;
-  private boolean flushCacheRequired; // 控制在执行sql后，是否刷新缓存，对应flushCache属性
-  private boolean useCache; // 控制在查询时，是否使用缓存，对应useCache属性
+  // 是否清空缓存（对 UPDATE/INSERT/DELETE 默认为 true）
+  // 控制在执行 sql 后，是否刷新缓存，对应 flushCache 属性
+  private boolean flushCacheRequired;
+  // 是否使用二级缓存（SELECT 默认为 true），对应 useCache 属性
+  private boolean useCache;
+  // 用于嵌套结果映射是否有序
   private boolean resultOrdered;
-  // SQL类型，INSERT/SELECT/DELETE/UPDATE
+  // SQL 类型，INSERT/SELECT/DELETE/UPDATE
   private SqlCommandType sqlCommandType;
+  // 主键生成器（如 Jdbc3KeyGenerator）
   private KeyGenerator keyGenerator;
-  private String[] keyProperties; // java属性名称集合
-  private String[] keyColumns; // 数据列名称集合
-  // 是否存在嵌套映射结果集
+  // 主键属性名（用于回填）
+  private String[] keyProperties;
+  // 主键列名（数据库列）
+  private String[] keyColumns;
+  // 是否包含嵌套 ResultMap，是否存在嵌套映射结果集
   private boolean hasNestedResultMaps;
-  // 数据库ID，用来区分不同环境
+  // 数据库厂商标识（用于多数据库适配），用来区分不同环境
   // MyBatis 会加载带有匹配当前数据库的 databaseId 属性的语句和所有不带 databaseId 属性的语句。 如果同时找到带有
   // databaseId 和不带 databaseId 的相同语句，则后者会被舍弃。
   private String databaseId;
+  // 日志对象
   private Log statementLog;
+  // SQL 语言驱动（如 XMLLanguageDriver）
   private LanguageDriver lang; // 语言解释器
-  // 多结果集时
+  // 多结果集名称（用于存储过程）
   private String[] resultSets;
 
   MappedStatement() {
@@ -320,7 +332,14 @@ public final class MappedStatement {
     return resultSets;
   }
 
+  /**
+   * 该类中核心方法。它根据传入的参数对象，结合 SqlSource，生成最终可执行的 BoundSql 对象。
+   * @param parameterObject
+   * @return
+   */
   public BoundSql getBoundSql(Object parameterObject) {
+    // 解析 sql 生成最终 SQL 字符串（已替换 #{} 为 ?）
+    // MappedStatement 的 SqlSource 在解析 #{} 时会生成 ParameterMapping，而 ${} 会被直接替换为字符串（无参数绑定）。
     BoundSql boundSql = sqlSource.getBoundSql(parameterObject);
     List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
     if (parameterMappings == null || parameterMappings.isEmpty()) {
