@@ -28,6 +28,7 @@ public class PerpetualCache implements Cache {
 
   private final String id;
 
+  // 线程不安全！但 SqlSession 本身也是非线程安全，所以 ok
   private final Map<Object, Object> cache = new HashMap<>();
 
   public PerpetualCache(String id) {

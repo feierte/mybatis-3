@@ -55,15 +55,15 @@ public abstract class BaseExecutor implements Executor {
   protected Executor wrapper;
 
   protected ConcurrentLinkedQueue<DeferredLoad> deferredLoads;
-  // 一级缓存（本地缓存），默认开启的，不需要任何配置：会话级缓存，生命周期是整个会话SqlSession，非常短暂，不能直接关闭，不能跨线程使用
-  // 注意这里的 本地缓存是同一个session内的缓存，也就是同一个open session内
-  // 根据CacheKey决定是否已经缓存
+  // 一级缓存（本地缓存）的核心存储，默认开启的，不需要任何配置：会话级缓存，生命周期是整个会话 SqlSession，非常短暂，不能直接关闭，不能跨线程使用（非线程安全）
+  // 注意这里的 本地缓存是同一个 session 内的缓存，也就是同一个 open session 内
+  // 根据 CacheKey 决定是否已经缓存
   /*
-   * 修改（执行sql前清空缓存）、查询（mapper.xml的sql块上配置了一级缓存作用域statementType="STATEMENT"，后置清空）、
+   * 修改（执行 sql 前清空缓存）、查询（mapper.xml 的 sql 块上配置了一级缓存作用域 statementType="STATEMENT"，后置清空）、
    * 提交（提交前清空缓存）、回滚（回滚前清空缓存），都可能会清空一级缓存
    */
   protected PerpetualCache localCache;
-  // 一级缓存：缓存输出参数
+  // 一级缓存，和存储过程有关
   protected PerpetualCache localOutputParameterCache;
   protected Configuration configuration;
 
@@ -121,7 +121,7 @@ public abstract class BaseExecutor implements Executor {
     if (closed) {
       throw new ExecutorException("Executor was closed.");
     }
-    clearLocalCache();
+    clearLocalCache(); // ← 关键！执行任何 update 都清空一级缓存，这是为了保证数据一致性：修改数据后，旧缓存可能已过期。
     return doUpdate(ms, parameter);
   }
 
@@ -141,8 +141,9 @@ public abstract class BaseExecutor implements Executor {
   public <E> List<E> query(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler) throws SQLException {
     // 根据传入的参数动态的获取sql语句，最后返回的是BoundSql对象
     BoundSql boundSql = ms.getBoundSql(parameter);
-    // 为本次查询创建缓存的key
+    // 为本次查询创建缓存 key
     CacheKey key = createCacheKey(ms, parameter, rowBounds, boundSql);
+    // 执行带缓存的查询
     return query(ms, parameter, rowBounds, resultHandler, key, boundSql);
   }
 
@@ -159,17 +160,17 @@ public abstract class BaseExecutor implements Executor {
     }
     // queryStack为0 && mapper.xml的sql块上配置了flushCache=true，前置清空缓存
     if (queryStack == 0 && ms.isFlushCacheRequired()) {
-      clearLocalCache();
+      clearLocalCache();  // 如果是 UPDATE/INSERT/DELETE，默认 flushCache=true，清空缓存
     }
     List<E> list;
     try {
       queryStack++;
-      // resultHandler为空，先查本地缓存（一级缓存），注意这里的 本地缓存是同一个session内的缓存，也就是同一个open session内。
+      // 尝试从一级缓存中获取
       list = resultHandler == null ? (List<E>) localCache.getObject(key) : null;
       if (list != null) {
         handleLocallyCachedOutputParameters(ms, key, parameter, boundSql);
       } else {
-        // 本地缓存没有，再去查数据库，查询到结果放入localCache
+        // 一级缓存未命中，再去查数据库，查询到结果放入一级缓存中
         list = queryFromDatabase(ms, parameter, rowBounds, resultHandler, key, boundSql);
       }
     } finally {
@@ -226,10 +227,11 @@ public abstract class BaseExecutor implements Executor {
      * 6、环境相同。environmentId=development 通常不会跨环境开发，可以忽略
      */
     CacheKey cacheKey = new CacheKey();
-    cacheKey.update(ms.getId());
-    cacheKey.update(rowBounds.getOffset());
-    cacheKey.update(rowBounds.getLimit());
-    cacheKey.update(boundSql.getSql());
+    cacheKey.update(ms.getId());              // 1. SQL ID（如 com.UserMapper.selectById）
+    cacheKey.update(rowBounds.getOffset());   // 2. 分页偏移
+    cacheKey.update(rowBounds.getLimit());    // 3. 分页大小
+    cacheKey.update(boundSql.getSql());       // 4. 最终 SQL 字符串
+    // 5. 参数值（遍历 ParameterMapping）
     List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
     TypeHandlerRegistry typeHandlerRegistry = ms.getConfiguration().getTypeHandlerRegistry();
     // mimic DefaultParameterHandler logic
@@ -247,9 +249,10 @@ public abstract class BaseExecutor implements Executor {
           MetaObject metaObject = configuration.newMetaObject(parameterObject);
           value = metaObject.getValue(propertyName);
         }
-        cacheKey.update(value); // sql参数
+        cacheKey.update(value); // ← sql 参数值参与 hash，参数对象的引用地址不影响缓存键，只看值是否相等。只要参数值相同，即使传入新对象，也能命中缓存。
       }
     }
+    // 6. Environment ID（多数据源场景）
     if (configuration.getEnvironment() != null) {
       // issue #176
       cacheKey.update(configuration.getEnvironment().getId());
@@ -350,13 +353,14 @@ public abstract class BaseExecutor implements Executor {
 
   private <E> List<E> queryFromDatabase(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
     List<E> list;
-    // 在缓存中，添加占位对象。此处的占位符和延迟加载有关，可见 DeferredLoad#canLoad() 方法
+    // 在缓存中，添加占位对象。先放一个占位符（防止循环引用或递归查询时死锁）
+    // 使用 EXECUTION_PLACEHOLDER 是为了防止在结果映射过程中再次触发相同查询（如嵌套查询），导致无限递归。
     localCache.putObject(key, EXECUTION_PLACEHOLDER);
     try {
-      // 执行数据库读操作
+      // 真正执行 SQL 查询，执行数据库读操作
       list = doQuery(ms, parameter, rowBounds, resultHandler, boundSql);
     } finally {
-      // 从缓存中，移除占位对象
+      // 从缓存中，移除占位对象，确保占位符被清理（异常时也清理）
       localCache.removeObject(key);
     }
     // 将查询结果缓存到一级缓存中
