@@ -100,23 +100,32 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
  */
 public class Configuration {
 
-  protected Environment environment; // 对应mybatis-config.xml中</environment>标签
+  // Environment 是 MyBatis 对运行环境的抽象，对应 mybatis-config.xml 中的 <environment/> 标签。
+  // 通常对应一个数据库连接池（如 HikariCP、Druid）
+  protected Environment environment; //
 
   protected boolean safeRowBoundsEnabled; // 对应mybatis-config.xml中setting属性safeRowBoundsEnabled，允许在嵌套语句中使用分页（RowBounds）。如果允许使用则设置为false
   protected boolean safeResultHandlerEnabled = true;
   protected boolean mapUnderscoreToCamelCase;
 
   /**
-   * 对应mybatis-config.xml中setting属性aggressiveLazyLoading
-   * 当开启时，任何方法的调用都会加载该对象的所有属性。否则，每个属性会按需加载（参考lazyLoadTriggerMethods）
+   * 是否激进加载（true：访问任意属性触发所有懒加载属性）
+   * 对应 mybatis-config.xml 中 setting 属性 aggressiveLazyLoading。
+   * 当开启时，任何方法的调用都会加载该对象的所有属性。否则，每个属性会按需加载（参考 lazyLoadTriggerMethods）
    * 默认为：true
    */
   protected boolean aggressiveLazyLoading;
+  // 是否允许单条 SQL 返回多个结果集
   protected boolean multipleResultSetsEnabled = true;
+  // 是否使用 JDBC 自动生成主键（如自增 ID）
   protected boolean useGeneratedKeys;
+  // 使用列标签（getColumnLabel）而非列名（getColumnName）
   protected boolean useColumnLabel = true;
-  protected boolean cacheEnabled = true; // 对应配置文件中setting属性cacheEnabled，全局地开启或关闭配置文件中的所有映射器已经配置的任何缓存。
+  // 是否启用二级缓存
+  // 对应配置文件中 setting 属性 cacheEnabled，全局地开启或关闭配置文件中的所有映射器已经配置的任何缓存。
+  protected boolean cacheEnabled = true;
   protected boolean callSettersOnNulls;
+  // 是否使用实际方法参数名（Java 8+ 需编译时保留参数名）
   protected boolean useActualParamName = true;
   protected boolean returnInstanceForEmptyRow;
   protected boolean shrinkWhitespacesInSql;
@@ -125,7 +134,9 @@ public class Configuration {
   protected Class<? extends Log> logImpl;
   protected Class<? extends VFS> vfsImpl;
   protected Class<?> defaultSqlProviderType;
+  // 一级缓存范围：SESSION / STATEMENT
   protected LocalCacheScope localCacheScope = LocalCacheScope.SESSION;
+  // null 值默认 JDBC 类型
   protected JdbcType jdbcTypeForNull = JdbcType.OTHER;
 
   /**
@@ -139,9 +150,12 @@ public class Configuration {
   protected AutoMappingBehavior autoMappingBehavior = AutoMappingBehavior.PARTIAL; // 对应mybatis-config.xml中setting属性autoMappingBehavior
   protected AutoMappingUnknownColumnBehavior autoMappingUnknownColumnBehavior = AutoMappingUnknownColumnBehavior.NONE;
 
-  protected Properties variables = new Properties(); // 对应配置文件中<properties>标签，将标签中指定的properties文件中的键值对解析到variables中
-  protected ReflectorFactory reflectorFactory = new DefaultReflectorFactory(); // 对应mybatis-config.xml中</reflectorFactory>标签
-  protected ObjectFactory objectFactory = new DefaultObjectFactory(); // 对应mybatis-config.xml中</objectFactory>标签
+  // 对应配置文件中 <properties> 标签，将标签中指定的 properties 文件中的键值对解析到 variables 中
+  protected Properties variables = new Properties();
+  // 缓存 Class 的元信息（getter/setter），对应 mybatis-config.xml 中的 <reflectorFactory> 标签
+  protected ReflectorFactory reflectorFactory = new DefaultReflectorFactory();
+  // 创建结果对象（如 User），对应 mybatis-config.xml 中的 <objectFactory> 标签
+  protected ObjectFactory objectFactory = new DefaultObjectFactory();
   protected ObjectWrapperFactory objectWrapperFactory = new DefaultObjectWrapperFactory(); // 对应mybatis-config.xml中</objectWrapperFactory>标签
 
   /**
@@ -161,26 +175,29 @@ public class Configuration {
   protected Class<?> configurationFactory;
 
   protected final MapperRegistry mapperRegistry = new MapperRegistry(this); // 对应mybatis-config.xml中<mappers>标签
-  protected final InterceptorChain interceptorChain = new InterceptorChain(); // 对应mybatis-config.xml中<plugins>标签
+  // 对应 mybatis-config.xml 中的 <plugins/> 标签
+  protected final InterceptorChain interceptorChain = new InterceptorChain();
+  // 类型处理器注册表，管理 Java 类型 ↔ JDBC 类型的转换器（如 String ↔ VARCHAR）
   protected final TypeHandlerRegistry typeHandlerRegistry = new TypeHandlerRegistry(this);
-  protected final TypeAliasRegistry typeAliasRegistry = new TypeAliasRegistry(); // 对应mybatis-config.xml中<typeAliases>标签
+  // 类型别名注册表，对应 mybatis-config.xml 中的 <typeAliases> 标签或 @Alias 注解，如 "User" → com.example.User.class
+  protected final TypeAliasRegistry typeAliasRegistry = new TypeAliasRegistry();
   protected final LanguageDriverRegistry languageRegistry = new LanguageDriverRegistry();
 
-  /**
-   * key: ${namespace}.${id}
-   * value: MappedStatement 对象
-   */
+
+  // 所有 SQL 语句的容器，key 为 namespace.id（如 "com.UserMapper.selectUser"）
   protected final Map<String, MappedStatement> mappedStatements = new StrictMap<MappedStatement>("Mapped Statements collection")
       .conflictMessageProducer((savedValue, targetValue) ->
           ". please check " + savedValue.getResource() + " and " + targetValue.getResource());
-  // 二级缓存，key：mapper.xml中的namespace，
-  // mapper.xml中<cache/>标签配置的Cache就存放在这里
+  // 二级缓存实例（每个 namespace 可有一个 Cache），key：mapper.xml 中的 namespace，
+  // mapper.xml 中的 <cache/> 标签配置的 Cache 就存放在这里
   protected final Map<String, Cache> caches = new StrictMap<>("Caches collection");
+  // 存储 <resultMap/> 定义，用于结果映射
   protected final Map<String, ResultMap> resultMaps = new StrictMap<>("Result Maps collection");
   protected final Map<String, ParameterMap> parameterMaps = new StrictMap<>("Parameter Maps collection");
   protected final Map<String, KeyGenerator> keyGenerators = new StrictMap<>("Key Generators collection");
 
-  protected final Set<String> loadedResources = new HashSet<>(); // 存放已经加载过的Mapper.xml文件的资源路径
+  // 存放已经加载过的 Mapper.xml 文件的资源路径
+  protected final Set<String> loadedResources = new HashSet<>();
   protected final Map<String, XNode> sqlFragments = new StrictMap<>("XML fragments parsed from previous mappers");
 
   protected final Collection<XMLStatementBuilder> incompleteStatements = new LinkedList<>();

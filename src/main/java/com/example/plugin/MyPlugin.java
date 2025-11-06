@@ -42,7 +42,7 @@ public class MyPlugin implements Interceptor {
   public Object intercept(Invocation invocation) throws Throwable {
     // 增强逻辑
     System.out.println("对方法进行了增强.....");
-    Object result = invocation.proceed(); // 执行原方法
+    Object result = invocation.proceed(); // 执行目标方法
     return result;
   }
 

@@ -25,14 +25,17 @@
     <settings>
         <setting name="cacheEnabled" value="true" />
         <setting name="useGeneratedKeys" value="true" />
-        <setting name="defaultExecutorType" value="REUSE" />
+<!--        <setting name="defaultExecutorType" value="REUSE" />-->
         <!-- 指定 MyBatis 所用日志的具体实现，未指定时将自动查找。 -->
         <!--<setting name="logImpl" value="STDOUT_LOGGING" />-->
     </settings>
 
-    <!--<typeAliases>
-        <typeAlias type="org.sperri.mybatis.springboot.pojo.GeosoundDO" alias="geosoundDO"/>
-    </typeAliases>-->
+    <plugins>
+        <!-- 注册拦截器，一个plugin表示一个拦截器 -->
+        <plugin interceptor="com.example.plugin.MyPlugin">
+            <!--<property name="databaseType" value="mysql"/>-->
+        </plugin>
+    </plugins>
 
     <!-- 环境配置，可以有多个，通过default指定默认 -->
     <environments default="development">

@@ -29,6 +29,8 @@ import org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory;
 
 /**
  * @author Clinton Begin
+ *
+ * @apiNote 用于统一访问对象属性（支持 POJO、Map、Collection 等），参数绑定和结果映射都依赖它。
  */
 public class MetaObject {
 
