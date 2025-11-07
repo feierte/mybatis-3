@@ -197,7 +197,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
       ResultMap resultMap = resultMaps.get(resultSetCount);
       // 处理ResultSet，将结果添加到multipleResults中
       handleResultSet(rsw, resultMap, multipleResults, null);
-      // 获得下一个ResultSet对象，并封装成ResultSetWrapper对象
+      // 获得下一个ResultSet对象（存储过程场景）
       rsw = getNextResultSet(stmt);
       // 清理
       cleanUpAfterHandlingResultSet();
@@ -302,7 +302,8 @@ public class DefaultResultSetHandler implements ResultSetHandler {
   // 处理ResultSet，将结果添加到multipleResults中
   private void handleResultSet(ResultSetWrapper rsw, ResultMap resultMap, List<Object> multipleResults, ResultMapping parentMapping) throws SQLException {
     try {
-      if (parentMapping != null) { // 暂可忽略。因为只有存储过程的情况，才走这个条件
+      if (parentMapping != null) {
+        // 处理嵌套结果（如 collection/association 的 nested result）
         handleRowValues(rsw, resultMap, null, RowBounds.DEFAULT, parentMapping);
       } else {
         if (resultHandler == null) { // 如果没有自定义的resultHandler，则创建默认的DefaultResultHandler对象
@@ -332,10 +333,12 @@ public class DefaultResultSetHandler implements ResultSetHandler {
 
   public void handleRowValues(ResultSetWrapper rsw, ResultMap resultMap, ResultHandler<?> resultHandler, RowBounds rowBounds, ResultMapping parentMapping) throws SQLException {
     if (resultMap.hasNestedResultMaps()) {
+      // 复杂映射：含 <association> 或 <collection>
       ensureNoRowBounds();
       checkResultHandler();
       handleRowValuesForNestedResultMap(rsw, resultMap, resultHandler, rowBounds, parentMapping);
     } else {
+      // 简单映射：平铺字段
       handleRowValuesForSimpleResultMap(rsw, resultMap, resultHandler, rowBounds, parentMapping);
     }
   }
@@ -359,10 +362,13 @@ public class DefaultResultSetHandler implements ResultSetHandler {
       throws SQLException {
     DefaultResultContext<Object> resultContext = new DefaultResultContext<>();
     ResultSet resultSet = rsw.getResultSet();
-    skipRows(resultSet, rowBounds);
+    skipRows(resultSet, rowBounds); // 处理 RowBounds 分页
     while (shouldProcessMoreRows(resultContext, rowBounds) && !resultSet.isClosed() && resultSet.next()) {
+      // 1. 解析 Discriminator（鉴别器，用于多态映射）
       ResultMap discriminatedResultMap = resolveDiscriminatedResultMap(resultSet, resultMap, null);
+      // 2. 创建 Java 对象 ← 核心！
       Object rowValue = getRowValue(rsw, discriminatedResultMap, null);
+      // 3. 存入 ResultHandler
       storeObject(resultHandler, resultContext, rowValue, parentMapping, resultSet);
     }
   }
@@ -405,15 +411,20 @@ public class DefaultResultSetHandler implements ResultSetHandler {
 
   private Object getRowValue(ResultSetWrapper rsw, ResultMap resultMap, String columnPrefix) throws SQLException {
     final ResultLoaderMap lazyLoader = new ResultLoaderMap();
+    // 1. 创建目标对象（如 User.class）
     Object rowValue = createResultObject(rsw, resultMap, lazyLoader, columnPrefix);
     if (rowValue != null && !hasTypeHandlerForResultObject(rsw, resultMap.getType())) {
       final MetaObject metaObject = configuration.newMetaObject(rowValue);
       boolean foundValues = this.useConstructorMappings;
+      // 2. 是否需要自动映射（auto-mapping）
       if (shouldApplyAutomaticMappings(resultMap, false)) {
         foundValues = applyAutomaticMappings(rsw, resultMap, metaObject, columnPrefix) || foundValues;
       }
+      // 3. 应用显式 ResultMapping（<id>, <result>）
       foundValues = applyPropertyMappings(rsw, resultMap, metaObject, lazyLoader, columnPrefix) || foundValues;
+      // 4. 处理 lazy loading（此处略）
       foundValues = lazyLoader.size() > 0 || foundValues;
+      // 如果没找到任何值，且配置了 returnInstanceForEmptyRow，则返回空对象
       rowValue = foundValues || configuration.isReturnInstanceForEmptyRow() ? rowValue : null;
     }
     return rowValue;
@@ -483,6 +494,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
       String column = prependPrefix(propertyMapping.getColumn(), columnPrefix);
       if (propertyMapping.getNestedResultMapId() != null) {
         // the user added a column attribute to a nested result map, ignore it
+        // 嵌套 ResultMap（如 association/collection），跳过此处
         column = null;
       }
       if (propertyMapping.isCompositeResult()

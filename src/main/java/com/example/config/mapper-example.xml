@@ -7,10 +7,23 @@
 
     <!--
         二级缓存开关，需要和 setting 属性 cacheEnabled 一起配合使用。
-        readOnly：默认值 false，每次 get 返回 反序列化的新对象，有性能开销，线程安全；
-                true 每次 get 返回 缓存中的同一个对象引用，性能高，线程不安全（多线程下可能被意外修改，导致脏数据）；
+        readOnly：默认值 false，每次 get 返回反序列化的新对象，实体类必须实现 Serializable 接口，有性能开销，线程安全；
+                true 每次 get 返回缓存中的同一个对象引用，性能高，线程不安全（多线程下可能被意外修改，导致脏数据）；
                 仅当确定结果对象 不会被修改 时，才可设为 readOnly=true。
+        eviction：缓存回收策略。
+            LRU（默认）：最近最少使用，移除最长时间不被使用的对象。
+            FIFO：先进先出，按对象进入缓存的顺序来移除它们。
+            SOFT：软引用，基于垃圾回收器状态和软引用规则移除对象。
+            WEAK：弱引用，更积极地基于垃圾收集器状态移除对象。
+        flushInterval：缓存刷新间隔（毫秒）。默认不清空，设置后到时间会清空整个缓存。
+        size：缓存存放多少元素。
     -->
     <cache readOnly="false" blocking="" eviction="" flushInterval="" size="" type=""/>
 
+
+    <resultMap id="parentResultMap" type="com.example.model.User"/>
+
+    <resultMap id="myResultMap" type="com.example.model.User" autoMapping="false" extends="parentResultMap">
+
+    </resultMap>
 </mapper>
