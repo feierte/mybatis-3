@@ -236,6 +236,8 @@ public class XMLMapperBuilder extends BaseBuilder {
       // <3> 获得 flushInterval、size、readWrite、blocking 属性
       Long flushInterval = context.getLongAttribute("flushInterval");
       Integer size = context.getIntAttribute("size");
+      // readOnly=false（默认）→ 使用 SerializedCache → 每次 get 都反序列化新对象
+      // readOnly=true → 使用 ReadOnlyCache → 直接返回缓存中的原对象（引用）
       boolean readWrite = !context.getBooleanAttribute("readOnly", false);
       boolean blocking = context.getBooleanAttribute("blocking", false);
       // <4> 获得 Properties 属性

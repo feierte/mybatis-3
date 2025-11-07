@@ -140,9 +140,10 @@ public class CachingExecutor implements Executor {
   @Override
   public <E> List<E> query(MappedStatement ms, Object parameterObject, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql)
       throws SQLException {
+    // 获取当前 namespace 的二级缓存
     Cache cache = ms.getCache();
     if (cache != null) {
-      // 如果sql语句中配置了 flushCache=true，就会执行刷新缓存
+      // 如果sql语句中配置了 flushCache=true，就会执行刷新缓存（先清空）
       flushCacheIfRequired(ms);
       if (ms.isUseCache() && resultHandler == null) {
         ensureNoOutParams(ms, boundSql); // 存储过程相关的，可忽略

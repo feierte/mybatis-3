@@ -56,6 +56,7 @@ public class MapperBuilderAssistant extends BaseBuilder {
 
   private String currentNamespace;
   private final String resource;
+  // 二级缓存，对整个 namespace 有效
   private Cache currentCache;
   private boolean unresolvedCacheRef; // issue #676
 
@@ -130,11 +131,11 @@ public class MapperBuilderAssistant extends BaseBuilder {
       Properties props) {
     Cache cache = new CacheBuilder(currentNamespace)
       // 如果在<cache>中配置了type属性，这里就是用type属性指定的自定义Cache，否则使用默认和一级缓存相同的PerpetualCache
-        .implementation(valueOrDefault(typeClass, PerpetualCache.class))
-        .addDecorator(valueOrDefault(evictionClass, LruCache.class))
+        .implementation(valueOrDefault(typeClass, PerpetualCache.class)) // 基础实现（默认 PerpetualCache）
+        .addDecorator(valueOrDefault(evictionClass, LruCache.class)) // LRU（如果配置了 size）
         .clearInterval(flushInterval)
         .size(size)
-        .readWrite(readWrite)
+        .readWrite(readWrite) // 决定是否使用 SerializedCache
         .blocking(blocking)
         .properties(props)
         .build();

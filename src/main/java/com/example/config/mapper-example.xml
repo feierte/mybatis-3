@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.mapper.UserMapper">
+
+    <!--
+        二级缓存开关，需要和 setting 属性 cacheEnabled 一起配合使用。
+        readOnly：默认值 false，每次 get 返回 反序列化的新对象，有性能开销，线程安全；
+                true 每次 get 返回 缓存中的同一个对象引用，性能高，线程不安全（多线程下可能被意外修改，导致脏数据）；
+                仅当确定结果对象 不会被修改 时，才可设为 readOnly=true。
+    -->
+    <cache readOnly="false" blocking="" eviction="" flushInterval="" size="" type=""/>
+
+</mapper>
