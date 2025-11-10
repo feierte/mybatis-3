@@ -84,6 +84,7 @@ public final class MappedStatement {
   // 日志对象
   private Log statementLog;
   // SQL 语言驱动（如 XMLLanguageDriver）
+  // 解析 <select> 内部的 SQL 文本，生成可执行的 SqlSource
   private LanguageDriver lang; // 语言解释器
   // 多结果集名称（用于存储过程）
   private String[] resultSets;

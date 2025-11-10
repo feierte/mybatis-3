@@ -26,4 +26,22 @@
     <resultMap id="myResultMap" type="com.example.model.User" autoMapping="false" extends="parentResultMap">
 
     </resultMap>
+
+    <!--
+        id：唯一标识。
+        parameterType：传入参数的完整类名或别名（可选，MyBatis 能够自动推断）。
+        resultType：返回结果的类型（简单类型或 POJO），不能与 resultMap 同时使用。
+        resultMap：引用 <resultMap> 的 id，用于复杂结果映射，不能与 resultType 同时使用。
+            如果 resultType 和 resultMap 都没设置，则使用自动映射（auto-mapping）。
+        flushCache：是否在调用前清空本地缓存和二级缓存。默认值 false，表示查询不刷新缓存。
+        useCache：是否使用二级缓存。默认 true，使用二级缓存。
+        timeout：查询超时时间（秒）。默认无，使用的是全局配置。
+        fetchSize：jdbc 驱动每次从数据库获取的记录数（用于性能调优）。
+        statementType：使用哪种 Statement 类型。默认使用 PREPARED。
+        databaseId：用于多数据库支持，匹配当前 databaseId。
+        resultOrdered：仅用于嵌套结果映射，表示结果是否已排序（优化嵌套映射）。默认 false
+        resultSets：用于多个结果集（存储过程返回多个 ResultSet）。
+     -->
+    <select id="selectDemo" databaseId="" fetchSize="" flushCache="" lang="" parameterType="" resultOrdered="" resultMap="" resultSets=""
+            resultSetType="DEFAULT" resultType="Account" statementType="PREPARED" timeout="" useCache=""/>
 </mapper>
